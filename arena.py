@@ -21,8 +21,10 @@ def cm(text = None):
 	elif text != None:
 		if text.lower() == "tavern":
 			print "\nPress any key to retun to the Tavern..."
-		if text.lower() == "library":
+		elif text.lower() == "library":
 			print "\nPress any key to retun to the Library..."
+		elif text.lower() == "fields":
+			print "\nPress any key to retun to the Fields.."
 	else:
 		print text
 	getch()
@@ -47,7 +49,7 @@ def get_val(inputs):
 		val = get_val(inputs)
 	return val
 
-#################
+#################	
 ##File management
 #################
 global NEW_GAME
@@ -147,9 +149,17 @@ def save_propt():
 		print "You may only save at the start of the day"
 		cm()
 		town(False)
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 ##Activities
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 def time_pass(hrs = 1):
 	global TIME
 	global MY_CHAR
@@ -202,9 +212,17 @@ def requires(gold = 1, hours = 1, life = 0):
 	else:
 		return True
 
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 ##Town
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 def town(refresh = True):
 	global TIME
 	clear()
@@ -224,7 +242,7 @@ def town(refresh = True):
 		print "to be able to save the game."
 
 	greeting()
-	val = get_val("stlfba")
+	val = get_val("stlfba9")
 
 	if val == "s":
 		save_propt()
@@ -232,15 +250,30 @@ def town(refresh = True):
 		tavern()
 	elif val == "l":
 		library()
+	elif val == "f":
+		fields()
+	elif val == "9":
+		town(True)
+	else:
+		print "ERROR IN TOWN SELECT"
+		cm()
 	save_propt()
 
 
 def exit():
 	print "Goodbye"
 	sys.exit()
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 ##Tavern
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 def tavern():
 	clear()
 	print "Welcome to the Tavern!"
@@ -325,9 +358,17 @@ def gamble():
 
 
 
-###########################
-##Tavern
-###########################
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
+##Library
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 def library():
 	clear()
 	print "Welcome to the Library!"
@@ -337,7 +378,7 @@ def library():
 	print "Borrow a book             (B)  1g  3hr"
 	print "Hire a tutor              (H)  3g  3hr"
 	print "Read and relax            (R)  0g  1hr"
-	print "Return to town            (T)  0g  0hr"
+	print "Return to Town            (T)  0g  0hr"
 
 	val = get_val("sbhrt")
 	clear()
@@ -352,7 +393,7 @@ def library():
 	elif val == "t":
 		town(False)
 	else:
-		print "ERROR IN TAVERN SELECT"
+		print "ERROR IN LIRARY SELECT"
 		cm()
 
 
@@ -401,14 +442,102 @@ def read():
 	library()
 
 
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
+##Training Fields
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
+def fields():
+	clear()
+	print "Welcome to the Library!"
+	print_useful()
+	print "Here you can do any of the following:"
+	print "Fight a training Dummy    (D)  0g  2hr"
+	print "Spar a Battle master      (M)  1g  3hr"
+	print "Run an obstacle Course    (C)  0g  2hr"
+	print "Enter a Race              (R)  3g  1hr"
+	print "Return to Town            (T)  0g  0hr"
+
+	val = get_val("dmcrt")
+	clear()
+	if val == "d":
+		dummy()
+	elif val == "m":
+		master()
+	elif val == "c":
+		course()
+	elif val == "r":
+		race()
+	elif val == "t":
+		town(False)
+	else:
+		print "ERROR IN FIELDS SELECT"
+		cm()
+
+
+def dummy():
+	if requires(0,2):
+		global MY_CHAR
+		print "You beat up a dummy for a nice work out."
+		time_pass(2)
+		stat("str")
+		print_stat(["str"])
+	cm("fields")
+	fields()
+
+def master():
+	if requires(1,3,1):
+		global MY_CHAR
+		print "You spar a master trainer for some time."
+		print "He shows you a thing or two about fighting."
+		print "You take a few hits though."
+		time_pass(3)
+		stat("str", 6)
+		stat("hp", -1)
+		print_stat(["str","hp","gold"])
+	cm("fields")
+	fields()
+
+def course():
+	if requires(0,2):
+		global MY_CHAR
+		print "You dash through obstacle course for a few hours"
+		time_pass(2)
+		stat("agil")
+		print_stat(["agil"])
+	cm("fields")
+	fields()
+
+def race():
+	if requires(3,1):
+		global MY_CHAR
+		print "You run a race and it really works your muscles."
+		time_pass(1)
+		stat("agil", 3)
+		print_stat(["agil"])
+	cm("fields")
+	fields()
 
 
 
-########################################
+
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 
 ##START GAME EVENTS
 
-###########################################
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
 clear()
 intro ="""___________________________________________________
 
@@ -423,8 +552,9 @@ intro ="""___________________________________________________
 
 
  		        
--===========]=   A Gladiator's Tale  =[===========-
-                      Beta 0.1
+                 A Gladiator's Tale  
+-===========]=        Beta 0.1       =[===========-
+                   By Josh Samara
 ___________________________________________________"""
 
 for line in intro.split("\n"):
