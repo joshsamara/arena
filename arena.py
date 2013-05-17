@@ -3,13 +3,13 @@ import random, time, os, sys,random, math
 from mygetch import *
 
 global DEFAULT_CHAR 
-DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":10, "wep":1, "luck":0, "hrs":0}
+DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":10, "wep":1, "luck":0, "day":0, "hrs": 10}
 global MY_CHAR
 MY_CHAR = DEFAULT_CHAR
 global TIME
 TIME = 10
 global PRETTY_STAT
-PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Def", "wep":"Weapon", "luck":"Luck", "hrs":"Hours"}
+PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Def", "wep":"Weapon", "luck":"Luck", "day":"Day"}
 
 #################
 ##Text management
@@ -23,6 +23,8 @@ def cm(text = None):
 			print "\nPress any key to retun to the Tavern..."
 		elif text.lower() == "library":
 			print "\nPress any key to retun to the Library..."
+		elif text.lower() == "town":
+			print "\nPress any key to retun to Town..."
 		elif text.lower() == "fields":
 			print "\nPress any key to retun to the Fields.."
 	else:
@@ -34,7 +36,7 @@ def clear():
 	os.system('clear')
 
 ##just give a string of valid inputs
-##you could give an array if you wanted
+##you could give an array or something if you wanted
 ##idk why you would
 ##wasting finger strokes
 def get_val(inputs):
@@ -45,7 +47,7 @@ def get_val(inputs):
 		invalid = invalid and not char in val
 
 	if invalid:
-		print "Invalid input"
+		print ".",	
 		val = get_val(inputs)
 	return val
 
@@ -84,7 +86,7 @@ def load():
 			print "Name:  %s" % loaded_char["name"]
 			print "Level: %s" % loaded_char["lvl"]
 			print "Gold:  %s" % loaded_char["gold"]
-			print "Time:  %s" % loaded_char["hrs"]
+			print "Day:   %s" % loaded_char["day"]
 			print "Would you like to load? (y/n)"
 			val = get_val("ny")
 			print "in function print"
@@ -119,35 +121,35 @@ def save():
 
 
 def save_propt():
-	global TIME
-	TIME = 10
 	clear()
-	if TIME >= 10:
-		print "Current Data\n"
-		print "Name:  %s" % MY_CHAR["name"]
-		print "Level: %s" % MY_CHAR["lvl"]
-		print "Gold:  %s" % MY_CHAR["gold"]
-		print "Would you like to save?"
-		print "Press Q to exit, S to save, E to save and exit, or R to return"
-		val = get_val("qsre")
+	print """
+  ____                               
+ / ___|  __ ___   _____              
+ \___ \ / _` \ \ / / _ \             
+  ___) | (_| |\ V /  __/             
+ |____/ \__,_| \_/ \___|  
+ """
+	print "Current Data"
+	print "Name:  %s" % MY_CHAR["name"]
+	print "Level: %s" % MY_CHAR["lvl"]
+	print "Gold:  %s" % MY_CHAR["gold"]
+	print "Day:   %s" % MY_CHAR["day"]
+	print "Would you like to save?"
+	print "Press Q to exit, S to save, E to save and exit, or R to return"
+	val = get_val("qsre")
 
-		if "s" == val:
-			save()
-			town(False)
+	if "s" == val:
+		save()
+		town(False)
 
-		if "e" == val:
-			save()
-			exit()
+	if "e" == val:
+		save()
+		exit()
 
-		if "q" == val:
-			exit()
+	if "q" == val:
+		exit()
 
-		if "r" == val:
-			town(False)
-	else:
-		print "Unable to save"
-		print "You may only save at the start of the day"
-		cm()
+	if "r" == val:
 		town(False)
 
 ######################################
@@ -161,10 +163,8 @@ def save_propt():
 ######################################
 
 def time_pass(hrs = 1):
-	global TIME
 	global MY_CHAR
-	TIME -= hrs
-	MY_CHAR["hrs"] += hrs
+	MY_CHAR["hrs"] -= hrs
 
 def spend_gold(cost = 1):
 	global MY_CHAR
@@ -174,27 +174,31 @@ def stat(stat, change = 1):
 	global MY_CHAR
 	MY_CHAR[stat] += change
 
-def print_useful():
-	global TIME
+def print_useful(noskip = False):
 	global MY_CHAR
-	print "Time Remaining:           %shrs" % TIME
-	print "Life Remaining:           %s" % MY_CHAR["hp"]
-	print "Gold Remaining:           %s" % MY_CHAR["gold"]
+	if noskip:
+		skip = ""
+	else:
+		skip = "\n"
+	print "%s#################################" % skip
+	print "Day:                      %s" % MY_CHAR["day"]
+	print "Time Remaining:           %s hrs" % MY_CHAR["hrs"]
+	print "Life Remaining:           %s hp" % MY_CHAR["hp"]
+	print "Gold Remaining:           %s gold" % MY_CHAR["gold"]
+	print "#################################\n"
 
 def print_stat(stats, showtime = True):
 	global PRETTY_STAT
-	global TIME
 	for stat in stats:
 		text = PRETTY_STAT[stat]
 		print "%s: %s" % (text, MY_CHAR[stat])
 	if showtime:
-		print "Time: %s" % TIME
+		print "Time: %s" % MY_CHAR["hrs"]
 
 def requires(gold = 1, hours = 1, life = 0):
 	global MY_CHAR
-	global TIME
 	goldcheck = MY_CHAR["gold"] < gold
-	hourcheck = TIME < hours
+	hourcheck = MY_CHAR["hrs"] < hours
 	lifecheck = MY_CHAR["hp"] < life
 
 	if goldcheck or hourcheck or lifecheck:
@@ -204,7 +208,7 @@ def requires(gold = 1, hours = 1, life = 0):
 			print "You have %s gold" % MY_CHAR["gold"]
 		if hourcheck:
 			print "You neeed %s hours" % hours
-			print "There are %s hours left" % TIME
+			print "There are %s hours left" % MY_CHAR["hrs"]
 		if lifecheck:
 			print "You need %s life" % lifecheck
 			print "You have %s life" % MY_CHAR["life"]
@@ -212,6 +216,11 @@ def requires(gold = 1, hours = 1, life = 0):
 	else:
 		return True
 
+def work(base, stat, factor):
+	global MY_CHAR
+	added = int(math.floor(MY_CHAR[stat]/factor))
+	earned = base + added
+	MY_CHAR["gold"] += earned
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -224,22 +233,27 @@ def requires(gold = 1, hours = 1, life = 0):
 ######################################
 
 def town(refresh = True):
-	global TIME
+	global MY_CHAR
 	clear()
 	if refresh:
-		TIME = 10
+		MY_CHAR["hrs"] = 16
 	def greeting():
-		print "Welcome to Town!"
+		print "Welcome to:"
+		print """
+  _____
+ |_   _|____      ___ __             
+   | |/ _ \ \ /\ / / '_ \            
+   | | (_) \ V  V /| | | |           
+   |_|\___/ \_/\_/ |_| |_|  
+		"""
 		print_useful()
-		print "You can do any of the following:"
-		print "Save and/or exit the game (S)*"
+		print "Here you can do any of the following:"
 		print "Enter the Tavern          (T)"
 		print "Go to the Library         (L)"
 		print "Go to the Trainng Fields  (F)"
 		print "Visit the Blacksmith      (B)" 
-		print "Return to the Arena       (A)"
-		print "\nNote: You must have 10hrs in the day"
-		print "to be able to save the game."
+		print "Enter the Arena           (A)"
+		print "Save and/or exit the game (S)"
 
 	greeting()
 	val = get_val("stlfba9")
@@ -276,25 +290,35 @@ def exit():
 
 def tavern():
 	clear()
-	print "Welcome to the Tavern!"
+	print "Welcome to the:"
+	print """
+  ______  
+ |_   _|_ ___   _____ _ __ _ __      
+   | |/ _` \ \ / / _ \ '__| '_ \     
+   | | (_| |\ V /  __/ |  | | | |    
+   |_|\__,_| \_/ \___|_|  |_| |_| 
+	"""
 	print_useful()
 	print "Here you can do any of the following:"
 	print "Buy a Meal                (M)  1g  1hr"
 	print "Grab a Drink              (D)  1g  1hr"
-	print "Rent a Room               (R)  0g  5hr"
+	print "Go to sleep               (s)  --  ---"
 	print "Gamble some gold          (G)  1g  1hr"
-	print "Return to town            (T)  0g  0hr"
+	print "Bartend                   (B)  --  8hr"	
+	print "Return to town            (T)  --  ---"
 
-	val = get_val("mdrgt")
+	val = get_val("mdsgbt")
 	clear()
 	if val == "m":
 		eat()
 	elif val == "d":
 		drink()
-	elif val == "r":
+	elif val == "s":
 		sleep()
 	elif val == "g":
 		gamble()
+	elif val == "b":
+		bartend()
 	elif val == "t":
 		town(False)
 	else:
@@ -330,14 +354,15 @@ def drink():
 	tavern()
 
 def sleep():
-	if requires(0, 5, 0):
+	if requires(0, 0, 0):
 		global MY_CHAR
-		print "You sleep for a few hours"
+		print "You sleep for the night"
 		MY_CHAR["hp"] = MY_CHAR["vit"]
-		time_pass(5)
+		stat("day")
 		print_stat(["hp"])
-	cm("tavern")
-	tavern()
+		print_stat(["day"])
+	cm("town")
+	town()
 	
 def gamble():
 	if requires():
@@ -346,7 +371,7 @@ def gamble():
 		chance = random.randint(1+MY_CHAR["int"],1000)
 		if chance > 900:
 			print 'You win!'
-			spend_gold(-1)
+			spend_gold(-10)
 		else:
 			print 'You lose.'
 			spend_gold()
@@ -355,6 +380,17 @@ def gamble():
 		print_stat(["gold"])
 	cm("tavern")
 	tavern()
+
+def bartend():
+	if requires(0,8):
+		global MY_CHAR
+		print "You work at the bar for a few hours"
+		work(1, "luck", 3)
+		time_pass(8)
+		print_stat(["gold"])
+	cm("tavern")
+	tavern()
+
 
 
 
@@ -371,16 +407,25 @@ def gamble():
 
 def library():
 	clear()
-	print "Welcome to the Library!"
-	print_useful()
+	print "Welcome to the:"
+	print """
+  _       _
+ | |   (_) |__  _ __ __ _ _ __ _   _ 
+ | |   | | '_ \| '__/ _` | '__| | | |
+ | |___| | |_) | | | (_| | |  | |_| |
+ |_____|_|_.__/|_|  \__,_|_|   \__, |
+                                |___/ 
+"""
+	print_useful(True)
 	print "Here you can do any of the following:"
-	print "Study Magics              (S)  0g  1hr"
+	print "Study Magics              (S)  --  1hr"
 	print "Borrow a book             (B)  1g  3hr"
 	print "Hire a tutor              (H)  3g  3hr"
-	print "Read and relax            (R)  0g  1hr"
-	print "Return to Town            (T)  0g  0hr"
+	print "Read and relax            (R)  --  1hr"
+	print "Tutor Magics              (M)  --  8hr"
+	print "Return to Town            (T)  --  ---"
 
-	val = get_val("sbhrt")
+	val = get_val("sbhrmt")
 	clear()
 	if val == "s":
 		study()
@@ -390,6 +435,8 @@ def library():
 		tutor()
 	elif val == "r":
 		read()
+	elif val == "m":
+		magics()
 	elif val == "t":
 		town(False)
 	else:
@@ -441,6 +488,15 @@ def read():
 	cm("library")
 	library()
 
+def magics():
+	if requires(0,8):
+		global MY_CHAR
+		print "You work a day teaching magic to others"
+		work(5, "int", 10)
+		time_pass(8)
+		print_stat(["gold"])
+	cm("library")
+	library()
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -451,19 +507,27 @@ def read():
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
-
 def fields():
 	clear()
-	print "Welcome to the Library!"
+	print "Welcome to the:"
+	print """
+  _____        _     _
+ |  ___(_) ___| | __| |___           
+ | |_  | |/ _ \ |/ _` / __|          
+ |  _| | |  __/ | (_| \__ \          
+ |_|   |_|\___|_|\__,_|___/         
+ """
 	print_useful()
 	print "Here you can do any of the following:"
-	print "Fight a training Dummy    (D)  0g  2hr"
+	print "Fight a training Dummy    (D)  --  2hr"
 	print "Spar a Battle master      (M)  1g  3hr"
-	print "Run an obstacle Course    (C)  0g  2hr"
+	print "Run an obstacle Course    (C)  --  2hr"
 	print "Enter a Race              (R)  3g  1hr"
-	print "Return to Town            (T)  0g  0hr"
+	print "Perform Show tricks       (S)  --  8hr"
+	print "Return to Town            (T)  --  ---"
 
-	val = get_val("dmcrt")
+	val = get_val("dmcrst")
+
 	clear()
 	if val == "d":
 		dummy()
@@ -473,6 +537,8 @@ def fields():
 		course()
 	elif val == "r":
 		race()
+	elif val == "s":
+		show()
 	elif val == "t":
 		town(False)
 	else:
@@ -523,7 +589,15 @@ def race():
 	cm("fields")
 	fields()
 
-
+def show():
+	if requires(0,8):
+		global MY_CHAR
+		print "You spend a day performing tricks"
+		work(3, "agil", 7)
+		time_pass(8)
+		print_stat(["gold"])
+	cm("fields")
+	fields()
 
 
 
@@ -573,18 +647,20 @@ if NEW_GAME:
 	clear()
 print "Greetings, %s" % MY_CHAR["name"]
 print "You are a mighty gladiator of the Emporer's Arena"
-print "You are a celebrity among the people"
+print "You are just starting out your gladiator career"
 print "However the hard truth is that you are forced to fight"
 print "Every day you must fight or the emperorer's legion will imprison you"
 print "You are allowed to wander town and train your skills in between fights"
+print "The emperorer will become bored with you in 100 days and have you killed"
 print "Can you become the ultimate warrior?"
 print "Will you get strong enough to fight your way to freedom?"
 cm()
 print ".\n.\n.\n.\n."
-
 print "For today, you have finished your battle and are ready to relax."
 print "Feel free to train in the fields, visit the smith and more"
 print "The tavern has given you a permanent room. You can rest there"
-cm("Press any key to proceed to town.....")
-
-town()
+cm("Press any key to proceed to Town.....")
+if NEW_GAME:
+	town()
+else:
+	town(False)
