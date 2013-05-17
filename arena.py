@@ -3,13 +3,13 @@ import random, time, os, sys,random, math
 from mygetch import *
 
 global DEFAULT_CHAR 
-DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":10, "wep":1, "luck":0, "day":0, "hrs": 10}
+DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":1, "wep":1, "luck":0, "day":0, "hrs": 10}
 global MY_CHAR
 MY_CHAR = DEFAULT_CHAR
 global TIME
 TIME = 10
 global PRETTY_STAT
-PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Def", "wep":"Weapon", "luck":"Luck", "day":"Day"}
+PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day"}
 
 #################
 ##Text management
@@ -27,6 +27,8 @@ def cm(text = None):
 			print "\nPress any key to retun to Town..."
 		elif text.lower() == "fields":
 			print "\nPress any key to retun to the Fields.."
+		elif text.lower() == "smith":
+			print "\nPress any key to retun to the Blacksmith.."
 	else:
 		print text
 	getch()
@@ -130,12 +132,12 @@ def save_propt():
  |____/ \__,_| \_/ \___|  
  """
 
-	print "\n#################################"
+	print_bar(0)
 	print "Name:  %s" % MY_CHAR["name"]
 	print "Level: %s" % MY_CHAR["lvl"]
 	print "Gold:  %s" % MY_CHAR["gold"]
 	print "Day:   %s" % MY_CHAR["day"]
-	print "#################################\n"
+	print_bar(1)
 	print "Would you like to save?"
 	print "Press Q to exit, S to save, E to save and exit, or R to return"
 	val = get_val("qsre")
@@ -163,39 +165,58 @@ def save_propt():
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
+def print_bar(version):
+	if version == 0:
+		print "\n#################################"
+	elif version == 1:
+		print "#################################\n"
+	else:
+		print "#################################"
 
 def time_pass(hrs = 1):
 	global MY_CHAR
 	MY_CHAR["hrs"] -= hrs
 
 def spend_gold(cost = 1):
-	global MY_CHAR
-	MY_CHAR["gold"] -= cost
+	stat("gold", -cost)
 
 def stat(stat, change = 1):
 	global MY_CHAR
+	global PRETTY_STAT
+
+	if change < 0:
+		change_text = "decreased"
+		change_val = change * -1
+	else:
+		change_text = "increased"
+		change_val = change
 	MY_CHAR[stat] += change
+
+	if stat != "day":
+		print "%s %s by %s!"%(PRETTY_STAT[stat],change_text,change_val)
 
 def print_useful(noskip = False):
 	global MY_CHAR
 	if noskip:
-		skip = ""
+		bar1 = 2
 	else:
-		skip = "\n"
-	print "%s#################################" % skip
+		bar1 = 0
+	print_bar(bar1)
 	print "Day:                      %s" % MY_CHAR["day"]
 	print "Time Remaining:           %s hrs" % MY_CHAR["hrs"]
 	print "Life Remaining:           %s hp" % MY_CHAR["hp"]
 	print "Gold Remaining:           %s gold" % MY_CHAR["gold"]
-	print "#################################\n"
+	print_bar(1)
 
 def print_stat(stats, showtime = True):
 	global PRETTY_STAT
+	print_bar(0)
 	for stat in stats:
 		text = PRETTY_STAT[stat]
 		print "%s: %s" % (text, MY_CHAR[stat])
 	if showtime:
 		print "Time: %s" % MY_CHAR["hrs"]
+	print_bar(1)
 
 def requires(gold = 1, hours = 1, life = 0):
 	global MY_CHAR
@@ -222,7 +243,7 @@ def work(base, stat, factor):
 	global MY_CHAR
 	added = int(math.floor(MY_CHAR[stat]/factor))
 	earned = base + added
-	MY_CHAR["gold"] += earned
+	spend_gold(-earned)
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -268,8 +289,12 @@ def town(refresh = True):
 		library()
 	elif val == "f":
 		fields()
+	elif val == "b":
+		smith()
 	elif val == "9":
-		town(True)
+		MY_CHAR["gold"] += 100
+		MY_CHAR["hrs"] += 100
+		MY_CHAR["hp"] += 100
 	else:
 		print "ERROR IN TOWN SELECT"
 		cm()
@@ -294,7 +319,7 @@ def tavern():
 	clear()
 	print "Welcome to the:"
 	print """
-  ______  
+  _____ 
  |_   _|_ ___   _____ _ __ _ __      
    | |/ _` \ \ / / _ \ '__| '_ \     
    | | (_| |\ V /  __/ |  | | | |    
@@ -304,7 +329,7 @@ def tavern():
 	print "Here you can do any of the following:"
 	print "Buy a Meal                (M)  1g  1hr"
 	print "Grab a Drink              (D)  1g  1hr"
-	print "Go to sleep               (s)  --  ---"
+	print "Go to sleep               (S)  --  ---"
 	print "Gamble some gold          (G)  1g  1hr"
 	print "Bartend                   (B)  --  8hr"	
 	print "Return to town            (T)  --  ---"
@@ -333,7 +358,8 @@ def eat():
 		global MY_CHAR
 		print "You order a big steak and devour it"
 		print "It's relieving after a long day"
-		MY_CHAR["hp"] += int(math.ceil(int(MY_CHAR["vit"])/3))
+		heal = int(math.ceil(int(MY_CHAR["vit"])/3))
+		stat("hp", heal)
 		spend_gold()
 		time_pass()
 		print_stat(["hp","gold"])
@@ -347,7 +373,8 @@ def drink():
 		print "and drink it up in one gulp."
 		print "It's a little rough on the stomach,"
 		print "but you feel a little bit luckier"
-		MY_CHAR["hp"] -= int(math.ceil(MY_CHAR["vit"]/10))
+		hurt = -int(math.ceil(MY_CHAR["vit"]/10))
+		stat("hp", hurt)
 		stat("luck")
 		spend_gold()
 		time_pass()
@@ -361,8 +388,8 @@ def sleep():
 		print "You sleep for the night"
 		MY_CHAR["hp"] = MY_CHAR["vit"]
 		stat("day")
-		print_stat(["hp"])
-		print_stat(["day"])
+		# print_stat(["hp"])
+		# print_stat(["day"])
 	cm("town")
 	town()
 	
@@ -602,6 +629,99 @@ def show():
 	fields()
 
 
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+
+##Black Smith
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+def smith():
+	clear()
+	print "Welcome to the:"
+	print """
+   ____            _ _   _            
+ / ___| _ __ ___ (_) |_| |__         
+ \___ \| '_ ` _ \| | __| '_ \        
+  ___) | | | | | | | |_| | | |       
+ |____/|_|_|_| |_|_|\__|_| |_|        
+ """
+	print_useful()
+	print "Here you can do any of the following:"
+	print "Upgrade your Weapon       (W)  ?g  ---"
+	print "Upgrade your Armor        (A)  ?g  ---"
+	print "Work the Forge            (F)  --  8hr"
+	print "Return to Town            (T)  --  ---"
+
+	val = get_val("waft")
+
+	clear()
+	if val == "w":
+		wepup()
+	elif val == "a":
+		armup()
+	elif val == "f":
+		forge()
+	elif val == "t":
+		town(False)
+	else:
+		print "ERROR IN FIELDS SELECT"
+		cm()
+
+
+def wepup():
+	global MY_CHAR
+	clear()
+	cost = int(math.pow(10,MY_CHAR["wep"]))
+	print_bar(0)
+	print "Current weapon level:   %s"% MY_CHAR["wep"]
+	print "Current upgrade cost:   %s gold" % cost
+	print_bar(1)
+	print "Would you like to upgrade your weapon? (y/n)"
+
+	val = get_val("yn")
+	clear()
+	if val == "y":
+		if requires(cost, 0):
+			print "You upgrade your weapon."
+			stat("wep")
+			print_stat(["wep"])
+	cm("smith")
+	smith()
+
+def armup():
+	global MY_CHAR
+	clear()
+	cost = int(math.pow(10,MY_CHAR["def"]))
+	print_bar(0)
+	print "Current armor level:    %s"% MY_CHAR["def"]
+	print "Current upgrade cost:   %sgold" % cost
+	print_bar(1)
+	print "Would you like to upgrade your armor? (y/n)"
+
+	val = get_val("yn")
+	clear()
+
+	if val == "y":
+		if requires(cost, 0):
+
+			print "You upgrade your armor."
+			stat("def")
+			print_stat(["def"])
+	cm("smith")
+	smith()
+
+def forge():
+	if requires(0,8):
+		global MY_CHAR
+		print "You spend a day performing tricks"
+		work(10, "str", 10)
+		time_pass(8)
+		print_stat(["gold"])
+	cm("smith")
+	smith()
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
