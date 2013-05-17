@@ -129,11 +129,13 @@ def save_propt():
   ___) | (_| |\ V /  __/             
  |____/ \__,_| \_/ \___|  
  """
-	print "Current Data"
+
+	print "\n#################################"
 	print "Name:  %s" % MY_CHAR["name"]
 	print "Level: %s" % MY_CHAR["lvl"]
 	print "Gold:  %s" % MY_CHAR["gold"]
 	print "Day:   %s" % MY_CHAR["day"]
+	print "#################################\n"
 	print "Would you like to save?"
 	print "Press Q to exit, S to save, E to save and exit, or R to return"
 	val = get_val("qsre")
