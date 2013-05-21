@@ -2,13 +2,8 @@
 import random, time, os, sys,random, math
 from mygetch import *
 
-global DEFAULT_CHAR 
 DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":1, "wep":1, "luck":0, "day":0, "hrs": 10}
-global MY_CHAR
 MY_CHAR = DEFAULT_CHAR
-global TIME
-TIME = 10
-global PRETTY_STAT
 PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day"}
 
 #################
@@ -51,6 +46,7 @@ def get_val(inputs):
 	if invalid:
 		print ".",	
 		val = get_val(inputs)
+	clear()
 	return val
 
 #################	
@@ -291,6 +287,8 @@ def town(refresh = True):
 		fields()
 	elif val == "b":
 		smith()
+	elif val == "a":
+		arena()
 	elif val == "9":
 		MY_CHAR["gold"] += 100
 		MY_CHAR["hrs"] += 100
@@ -642,7 +640,7 @@ def smith():
 	clear()
 	print "Welcome to the:"
 	print """
-   ____            _ _   _            
+  ____            _ _   _            
  / ___| _ __ ___ (_) |_| |__         
  \___ \| '_ ` _ \| | __| '_ \        
   ___) | | | | | | | |_| | | |       
@@ -688,6 +686,8 @@ def wepup():
 			print "You upgrade your weapon."
 			stat("wep")
 			print_stat(["wep"])
+	elif val == "n":
+		print "You decide to save upgrading for later"
 	cm("smith")
 	smith()
 
@@ -706,10 +706,11 @@ def armup():
 
 	if val == "y":
 		if requires(cost, 0):
-
 			print "You upgrade your armor."
 			stat("def")
 			print_stat(["def"])
+	elif val == "n":
+		print "You decide to save upgrading for later"
 	cm("smith")
 	smith()
 
@@ -727,6 +728,107 @@ def forge():
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
 
+##		A
+##		R
+##		E
+##		N
+##		A
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
+def arena():
+	clear()
+	print "Welcome to the:"
+	print """
+		 A      
+		 R      
+		 E     
+		 N      
+		 A       
+ """
+	print_useful()
+	print "Here you must either fight or return to town"
+	print "Fight!                    (F)  --  1hr"
+	print "Return to Town            (T)  --  ---"
+
+	val = get_val("ft")
+
+	clear()
+	if val == "f":
+		fight()
+	elif val == "t":
+		town(False)
+	else:
+		print "ERROR IN ARENA SELECT"
+		cm()
+
+
+def fight():
+	all_picks = []
+	for i in range(100):
+		this_pick = pick_diff()
+		all_picks.append(this_pick)
+		print this_pick
+	all_picks.sort()
+	print all_picks
+	cm()
+	town(False)
+# # Enenemies:
+# # 1 Peasant
+# # 2 Fighter, Thief, Apprentice
+# # 3 Warrior, Ranger, Mage
+# # 4 Paladin, Assassin, Wizard
+# # 5 Minotaur, Ninja, Archon
+# # 6 Shadow
+def pick_diff():
+	global MY_CHAR
+	range1 = enemy_range(1, MY_CHAR["lvl"])
+	range3 = range1 + enemy_range(3, MY_CHAR["lvl"])
+	range4 = range3 + enemy_range(4, MY_CHAR["lvl"])
+	range5 = range4 + enemy_range(5, MY_CHAR["lvl"])
+	range6 = range5 + enemy_range(6, MY_CHAR["lvl"])
+	print "Ranges: %s,%s,%s,%s,%s" % (range1,range3,range4,range5,range6)
+	pick = random.randint(1,100)
+	if pick < range1:
+		return 1
+	elif pick < range3:
+		return 3
+	elif pick < range4:
+		return 4
+	elif pick < range5:
+		return 5
+	elif pick < range6:
+		return 6
+	else:
+		return 2
+
+def enemy_range(diff, lvl):
+	if diff == 1:
+		if lvl < 90:
+			return 90 - lvl
+		else:
+			return 0
+	elif diff == 3:
+		return lvl/5 * 2
+	elif diff == 4:
+		if lvl > 25:
+			return math.floor(lvl/5) * 2 - 10
+		else:
+			return 0
+	elif diff ==5:
+		if lvl > 40:
+			return lvl/5 * 2 - 20
+		else:
+			return 0
+	elif diff == 6:
+		if lvl > 75:
+			return lvl/5 * 2 - 30
+
+
+######################################
+## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+######################################
 
 ##START GAME EVENTS
 
