@@ -1,20 +1,10 @@
 #!/usr/bin/python
-import random, time, os, sys,random, math
+import random, time, os, sys, math
 from mygetch import *
 
 DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":1, "wep":1, "luck":0, "day":0, "hrs": 10}
 MY_CHAR = DEFAULT_CHAR
 PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day"}
-ENEMY_TYPES = [["Peasant"], ["Fighter", "Thief", "Apprentice"], ["Warrior", "Ranger", "Mage"], ["Paladin", "Assassin", "Wizard]"], ["Minotaur", "Ninja", "Archon"], ["Shadow"]]
-ENEMY_STATS = {"type":"", "lvl":0 , "hp":0, "str":0, "int":0, "agil":0, "vit":0, "def":0, "wep":0, "luck":0}
-# # Enenemies:
-# # 1 Peasant
-# # 2 Fighter, Thief, Apprentice
-# # 3 Warrior, Ranger, Mage
-# # 4 Paladin, Assassin, Wizard
-# # 5 Minotaur, Ninja, Archon
-# # 6 Shadow
-
 
 #################
 ##Text management
@@ -738,11 +728,11 @@ def forge():
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
 
-##		A
-##		R
-##		E
-##		N
-##		A
+#     _                         
+#    / \   _ __ ___ _ __   __ _ 
+#   / _ \ | '__/ _ \ '_ \ / _` |
+#  / ___ \| | |  __/ | | | (_| |
+# /_/   \_\_|  \___|_| |_|\__,_|         
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -751,11 +741,11 @@ def arena():
 	clear()
 	print "Welcome to the:"
 	print """
-		 A      
-		 R      
-		 E     
-		 N      
-		 A       
+     _                         
+    / \\   _ __ ___ _ __   __ _ 
+   / _ \\ | '__/ _ \\ '_ \\ / _` |
+  / ___ \\| | |  __/ | | | (_| |
+ /_/   \\_\\_|  \\___|_| |_|\\__,_| 
  """
 	print_useful()
 	print "Here you must either fight or return to town"
@@ -779,13 +769,7 @@ def fight():
 	battle()
 	cm()
 	town(False)
-# # Enenemies:
-# # 1 Peasant
-# # 2 Fighter, Thief, Apprentice
-# # 3 Warrior, Ranger, Mage
-# # 4 Paladin, Assassin, Wizard
-# # 5 Minotaur, Ninja, Archon
-# # 6 Shadow
+
 def pick_diff():
 	global MY_CHAR
 	range1 = enemy_range(1, MY_CHAR["lvl"])
@@ -806,101 +790,11 @@ def pick_diff():
 		difficulty = 6  #10/10
 	else:
 		difficulty = 2  #2/10
-	return make_enemy(difficulty)
+	return difficulty
 
-def enemy_range(diff, lvl):
-	if diff == 1:
-		if lvl < 90:
-			return 90 - lvl
-		else:
-			return 0
-	elif diff == 3:
-		return lvl/5 * 2
-	elif diff == 4:
-		if lvl > 25:
-			return math.floor(lvl/5) * 2 - 10
-		else:
-			return 0
-	elif diff ==5:
-		if lvl > 40:
-			return lvl/5 * 2 - 20
-		else:
-			return 0
-	elif diff == 6:
-		if lvl > 75:
-			return lvl/5 * 2 - 30
-		else:
-			return 0
 
-#Warrior|  Mage | Rogue |
-#========================
-#	    |	2x	|		|
-#========================
-#str    |int    |agil	|
-#def    |luck   |wep	|
-#vit    |       |		|
-#========================
-#		| 1.5x  |		|
-#========================
-#		|wep	|str	|
-#		|vit    |luck	|
-#========================
-#		| 1.25x	|
-#========================
-#wep	|		|
 
-def make_enemy(difficulty):
-	global ENEMY_TYPES
-	global ENEMY_STATS
-	global MY_CHAR
-	group = ENEMY_TYPES[difficulty-1]
-	choice = random.randint(0,len(group)-1)
-	ENEMY_STATS["type"] = group[choice]
-	ENEMY_STATS["lvl"] = difficulty
-	if difficulty == 6:
-		total_mult = 1
-	else:
-		total_mult = float(difficulty)/10
-	#warior multipliers
-	mults = {}
-	if choice == 0:
-		mults["str"] = 2
-		mults["int"] = 1
-		mults["agil"] = 1
-		mults["vit"] = 2
-		mults["def"] = 1
-		mults["wep"] = 1.25
-		mults["luck"] = 1
-	#mage multipliers
-	elif choice == 1:
-		mults["str"] = 1
-		mults["int"] = 2
-		mults["agil"] = 1
-		mults["vit"] = 1.5
-		mults["def"] = 1
-		mults["wep"] = 1.5
-		mults["luck"] = 2
-	#rogue multipliers
-	else:
-		mults["str"] = 1.5
-		mults["int"] = 1
-		mults["agil"] = 2
-		mults["vit"] = 1
-		mults["def"] = 1
-		mults["wep"] = 2
-		mults["luck"] = 1.5
-	
-	for stat in ["str","int","agil","vit","def","wep","luck"]:
-		ENEMY_STATS[stat] = MY_CHAR[stat] * mults[stat] * total_mult
-
-	ENEMY_STATS["hp"] = ENEMY_STATS["vit"]
-
-def battle():
-	global ENEMY_STATS
-	global MY_CHAR
-	battle_display()
-
-def battle_display():
+def battle_display(message):
 	global ENEMY_STATS
 	global MY_CHAR
 	print "-"*40
@@ -911,10 +805,10 @@ def battle_display():
 	print "HP: %s" % healthbar
 	print "-"*40
 
-	print "\n\n\n\n"
+	print message
 	print_bar(2)
 	print "Options:"
-	print "Fight!                    (A)"
+	print "Attack!                   (A)"
 	print "Run!                      (R)"
 	print_bar(2)
 
@@ -927,6 +821,31 @@ def battle_display():
 	print "-"*40
 
 
+def attack():
+	global ENEMY_STATS
+	global MY_CHAR
+	my_damage = damage_calc(MY_CHAR)
+	enemey_damage = damage_calc(ENEMY_STATS)
+	damage_to_me = damage_reduce(MY_CHAR,enemey_damage)
+	damage_to_enemy = damage_reduce(ENEMY_STATS,my_damage)
+	MY_CHAR["hp"] -= damage_to_me
+	ENEMY_STATS["hp"] -= damage_to_enemy
+	message = """
+You deal:    %s damage
+Enemy deals: %s damage
+""" % (damage_to_enemy, damage_to_me)
+	return message
+
+def damage_calc(char):
+	if random.randint(int(char["luck"]),100)==100:
+		crit = 2
+	else:
+		crit = 1
+	return (char["wep"] + char["agil"]/10 + char["str"])*(1+float(char["int"])/100+float(char["agil"])/500) * crit
+
+def damage_reduce(char,damage):
+	return (damage - char["def"])*(1-random.randint(1,char["agil"])/100)
+	
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
