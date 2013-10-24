@@ -5,6 +5,7 @@ from mygetch import *
 DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":1, "wep":1, "luck":0, "day":0, "hrs": 10}
 MY_CHAR = DEFAULT_CHAR
 PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day"}
+ENEMY_TYPES = [["Peasant"], ["Fighter", "Thief", "Apprentice"], ["Warrior", "Ranger", "Mage"], ["Paladin", "Assassin", "Wizard]"], ["Minotaur", "Ninja", "Archon"], ["Shadow"]]
 
 #################
 ##Text management
@@ -230,7 +231,7 @@ def requires(gold = 1, hours = 1, life = 0):
 			print "There are %s hours left" % MY_CHAR["hrs"]
 		if lifecheck:
 			print "You need %s life" % lifecheck
-			print "You have %s life" % MY_CHAR["life"]
+			print "You have %s life" % MY_CHAR["hp"]
 		return False
 	else:
 		return True
@@ -610,7 +611,7 @@ def race():
 	if requires(3,1):
 		global MY_CHAR
 		print "You run a race and it really works your muscles."
-		time_pass(1)
+		
 		stat("agil", 3)
 		print_stat(["agil"])
 	cm("fields")
@@ -756,6 +757,7 @@ def arena():
 
 	clear()
 	if val == "f":
+		time_pass(1)
 		fight()
 	elif val == "t":
 		town(False)
@@ -763,12 +765,35 @@ def arena():
 		print "ERROR IN ARENA SELECT"
 		cm()
 
-
 def fight():
-	pick_diff()
-	battle()
+	enemy = make_enemy(pick_diff())
+	battle(enemy)
 	cm()
 	town(False)
+
+def enemy_range(diff, lvl):
+	if diff == 1:
+		if lvl < 90:
+			return 90 - lvl
+		else:
+			return 0
+	elif diff == 3:
+		return lvl/5 * 2
+	elif diff == 4:
+		if lvl > 25:
+			return math.floor(lvl/5) * 2 - 10
+		else:
+			return 0
+	elif diff ==5:
+		if lvl > 40:
+			return lvl/5 * 2 - 20
+		else:
+			return 0
+	elif diff == 6:
+		if lvl > 75:
+			return lvl/5 * 2 - 30
+		else:
+			return 0
 
 def pick_diff():
 	global MY_CHAR
@@ -792,15 +817,29 @@ def pick_diff():
 		difficulty = 2  #2/10
 	return difficulty
 
+def make_enemy(diff):
+	global ENEMY_TYPES
+	return {'type':random.choice(ENEMY_TYPES[diff-1]), 'level': diff, 'hp': diff*1000 }
 
+def battle(enemy, message = "\n>"*4):
+	global MY_CHAR
+	battle_display(enemy, message)
+	val = get_val("ar")
+	clear()
+	if val == "a":
+		battle(*attack(enemy))
+	elif val == "r":
+		town(False)
+	else:
+		print "ERROR IN BATTLE SELECT"
 
-def battle_display(message):
-	global ENEMY_STATS
+def battle_display(enemy, message):
 	global MY_CHAR
 	print "-"*40
-	print "Enemy: %s" % ENEMY_STATS["type"]
-	print "Level: %s" % ENEMY_STATS["lvl"]
-	equals = int(math.ceil(ENEMY_STATS["hp"]/ENEMY_STATS["vit"]*25.0))
+	print "Enemy: %s" % enemy['type']
+	print "Level: %s" % enemy['level']
+	equals = int(math.ceil(enemy["hp"]/(enemy['level']*1000.0)*25.0))
+	print equals
 	healthbar = "[" + "="*equals+" "*(25-equals) + "]"
 	print "HP: %s" % healthbar
 	print "-"*40
@@ -820,31 +859,42 @@ def battle_display(message):
 	print "HP: %s %s/%s" % (your_healthbar,MY_CHAR["hp"],MY_CHAR["vit"])
 	print "-"*40
 
-
-def attack():
-	global ENEMY_STATS
+def attack(enemy):
+	pass
 	global MY_CHAR
-	my_damage = damage_calc(MY_CHAR)
-	enemey_damage = damage_calc(ENEMY_STATS)
-	damage_to_me = damage_reduce(MY_CHAR,enemey_damage)
-	damage_to_enemy = damage_reduce(ENEMY_STATS,my_damage)
+	my_damage = damage_calc(MY_CHAR, char = True)
+	enemy_damage = damage_calc(enemy, char = False)
+	damage_to_me = damage_reduce(MY_CHAR,  enemy_damage, char = True)
+	damage_to_enemy = damage_reduce(enemy, my_damage, char = False)
 	MY_CHAR["hp"] -= damage_to_me
-	ENEMY_STATS["hp"] -= damage_to_enemy
+	MY_CHAR["hp"] = max(MY_CHAR["hp"],0) #SAFEGAURD AGAINST NEGATIVE HP
+	enemy["hp"] -= damage_to_enemy
+	enemy["hp"] = max(enemy["hp"], 0)
 	message = """
-You deal:    %s damage
-Enemy deals: %s damage
-""" % (damage_to_enemy, damage_to_me)
-	return message
+>
+> You deal:    %s damage
+> Enemy deals: %s damage
+> """ % (damage_to_enemy, damage_to_me)
+	return enemy, message
 
-def damage_calc(char):
-	if random.randint(int(char["luck"]),100)==100:
-		crit = 2
+def damage_calc(stats, char = True):
+	if char:
+		##TODO: balance, crits?
+		base = int(stats["wep"]*(5+stats["str"]+stats["int"]))
+		rand = random.randrange(int(stats["agil"]),1+int(stats["luck"]+stats["agil"]))
+		return random.randrange(base, base+rand)
 	else:
-		crit = 1
-	return (char["wep"] + char["agil"]/10 + char["str"])*(1+float(char["int"])/100+float(char["agil"])/500) * crit
+		base = stats["level"] * 5
+		rand = stats["level"] * 2
+		return random.randrange(base, base+rand)
 
-def damage_reduce(char,damage):
-	return (damage - char["def"])*(1-random.randint(1,char["agil"])/100)
+
+def damage_reduce(stats,damage, char = True):
+	#TODO: agi = Dodge?
+	if char:
+		return int(damage-stats["def"])
+	else:
+		return int(damage)
 	
 
 ######################################
@@ -890,22 +940,23 @@ if NEW_GAME:
 	name = raw_input("What is your name?\n")
 	MY_CHAR["name"] = name
 	clear()
-print "Greetings, %s" % MY_CHAR["name"]
-print "You are a mighty gladiator of the Emporer's Arena"
-print "You are just starting out your gladiator career"
-print "However the hard truth is that you are forced to fight"
-print "Every day you must fight or the emperorer's legion will imprison you"
-print "You are allowed to wander town and train your skills in between fights"
-print "The emperorer will become bored with you in 100 days and have you killed"
-print "Can you become the ultimate warrior?"
-print "Will you get strong enough to fight your way to freedom?"
-cm()
-print ".\n.\n.\n.\n."
-print "For today, you have finished your battle and are ready to relax."
-print "Feel free to train in the fields, visit the smith and more"
-print "The tavern has given you a permanent room. You can rest there"
-cm("Press any key to proceed to Town.....")
-if NEW_GAME:
+	print "Greetings, %s" % MY_CHAR["name"]
+	print "You are a mighty gladiator of the Emporer's Arena"
+	print "You are just starting out your gladiator career"
+	print "However the hard truth is that you are forced to fight"
+	print "Every day you must fight or the emperorer's legion will imprison you"
+	print "You are allowed to wander town and train your skills in between fights"
+	print "The emperorer will become bored with you in 100 days and have you killed"
+	print "Can you become the ultimate warrior?"
+	print "Will you get strong enough to fight your way to freedom?"
+	cm()
+	print ".\n.\n.\n.\n."
+	print "For today, you have finished your battle and are ready to relax."
+	print "Feel free to train in the fields, visit the smith and more"
+	print "The tavern has given you a permanent room. You can rest there"
+	cm("Press any key to proceed to Town.....")
 	town()
 else:
+	print "Welcome back, %s" % MY_CHAR["name"]
+	cm("Press any key to proceed to Town.....")
 	town(False)
