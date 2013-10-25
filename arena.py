@@ -181,16 +181,43 @@ def stat(stat, change = 1):
 	global MY_CHAR
 	global PRETTY_STAT
 
-	if change < 0:
-		change_text = "decreased"
-		change_val = change * -1
+	pass_print = False
+	if stat == "hp" and MY_CHAR["hp"] >= MY_CHAR["vit"] and change > 0:
+		print "Already at max HP"
+		pass_print = True
 	else:
-		change_text = "increased"
-		change_val = change
-	MY_CHAR[stat] += change
+		if change < 0:
+			change_text = "decreased"
+			change_val = change * -1
+		else:
+			change_text = "increased"
+			change_val = change
 
-	if stat != "day":
+		if stat == "hp":
+			MY_CHAR["hp"] = max(MY_CHAR["hp"]+change, MY_CHAR["vit"])
+		else:
+			MY_CHAR[stat] += change
+
+	if stat == "day":
+		pass_print = True
+
+	if not pass_print:
 		print "%s %s by %s!"%(PRETTY_STAT[stat],change_text,change_val)
+
+def not_dead():
+	global MY_CHAR
+	if MY_CHAR["hp"] > 0:
+		return True
+	else:
+		stat("day")
+		MY_CHAR["hp"] = int(MY_CHAR["vit"]/10)
+		MY_CHAR["gold"] = random.randrange(int(MY_CHAR["gold"]/2), MY_CHAR["gold"])
+		MY_CHAR["hrs"] = random.randrange(1,10)
+		print "You have passed out!"
+		print "You wake up sometime in town"
+		print "It looks like some of your gold is missing"
+		cm("town")
+		town()
 
 def print_useful(noskip = False):
 	global MY_CHAR
@@ -215,7 +242,7 @@ def print_stat(stats, showtime = True):
 		print "Time: %s" % MY_CHAR["hrs"]
 	print_bar(1)
 
-def requires(gold = 1, hours = 1, life = 0):
+def requires(gold = 1, hours = 1, life = 1):
 	global MY_CHAR
 	goldcheck = MY_CHAR["gold"] < gold
 	hourcheck = MY_CHAR["hrs"] < hours
@@ -230,7 +257,7 @@ def requires(gold = 1, hours = 1, life = 0):
 			print "You neeed %s hours" % hours
 			print "There are %s hours left" % MY_CHAR["hrs"]
 		if lifecheck:
-			print "You need %s life" % lifecheck
+			print "You need %s life" % life
 			print "You have %s life" % MY_CHAR["hp"]
 		return False
 	else:
@@ -357,7 +384,7 @@ def eat():
 		global MY_CHAR
 		print "You order a big steak and devour it"
 		print "It's relieving after a long day"
-		heal = int(math.ceil(int(MY_CHAR["vit"])/3))
+		heal = int(math.ceil(int(MY_CHAR["vit"])/2))
 		stat("hp", heal)
 		spend_gold()
 		time_pass()
@@ -378,14 +405,18 @@ def drink():
 		spend_gold()
 		time_pass()
 		print_stat(["hp","luck", "gold"])
-	cm("tavern")
-	tavern()
+	if not_dead():
+		cm("tavern")
+		tavern()
+	else:
+		print "ERROR: broken direct in drink"
 
 def sleep():
 	if requires(0, 0, 0):
 		global MY_CHAR
 		print "You sleep for the night"
-		MY_CHAR["hp"] = MY_CHAR["vit"]
+		heal = int(math.ceil(int(MY_CHAR["vit"])/4))
+		stat("hp", heal)
 		stat("day")
 		# print_stat(["hp"])
 		# print_stat(["day"])
@@ -468,7 +499,7 @@ def library():
 	elif val == "t":
 		town(False)
 	else:
-		print "ERROR IN LIRARY SELECT"
+		print "ERROR IN LIBRARY SELECT"
 		cm()
 
 
@@ -594,8 +625,11 @@ def master():
 		stat("str", 6)
 		stat("hp", -1)
 		print_stat(["str","hp","gold"])
-	cm("fields")
-	fields()
+	if not_dead():
+		cm("fields")
+		fields()
+	else:
+		print "ERROR: broken direct in master()"
 
 def course():
 	if requires(0,2):
@@ -611,7 +645,7 @@ def race():
 	if requires(3,1):
 		global MY_CHAR
 		print "You run a race and it really works your muscles."
-		
+		time_pass(1)
 		stat("agil", 3)
 		print_stat(["agil"])
 	cm("fields")
@@ -757,7 +791,6 @@ def arena():
 
 	clear()
 	if val == "f":
-		time_pass(1)
 		fight()
 	elif val == "t":
 		town(False)
@@ -766,8 +799,10 @@ def arena():
 		cm()
 
 def fight():
-	enemy = make_enemy(pick_diff())
-	battle(enemy)
+	if requires(0,1):
+		time_pass(1)
+		enemy = make_enemy(pick_diff())
+		battle(enemy)
 	cm()
 	town(False)
 
@@ -827,7 +862,11 @@ def battle(enemy, message = "\n>"*4):
 	val = get_val("ar")
 	clear()
 	if val == "a":
-		battle(*attack(enemy))
+		enemy, message = attack(enemy)
+		if not_dead():
+			battle(enemy, message)
+		else:
+			print "Error in battle"
 	elif val == "r":
 		town(False)
 	else:
