@@ -28,7 +28,7 @@ class Character(object):
 		self.day = 0
 		self.hrs = 10
 
-	def save():
+	def save(self):
 		save_file = open('arena.save','w')
 		char_dict = self.__dict__
 		for key in char_dict.keys():
@@ -40,16 +40,16 @@ class Character(object):
 	####
 	# STAT MANAGEMENT
 	####
-	def time_pass(hrs = 1):
+	def time_pass(self,hrs = 1):
 		self.hrs -= hrs
 
-	def spend_gold(cost = 1):
-		stat("gold", -cost)
+	def spend_gold(self, cost = 1):
+		self.stat("gold", -cost)
 
-	def stat(stat, change = 1):
+	def stat(self, changed_stat, change = 1):
 		global PRETTY_STAT
 		pass_print = False
-		if stat == "hp" and self.hp >= self.vit and change > 0:
+		if changed_stat == "hp" and self.hp >= self.vit and change > 0:
 			print "Already at max HP"
 			pass_print = True
 		else:
@@ -60,22 +60,22 @@ class Character(object):
 				change_text = "increased"
 				change_val = change
 
-			if stat == "hp":
+			if changed_stat == "hp" and change < 0:
 				self.hp = max(self.hp+change, self.vit)
 			else:
-				self.stat += change
+				self.__dict__[changed_stat] += change
 
-		if stat == "day":
+		if changed_stat == "day":
 			pass_print = True
 
 		if not pass_print:
-			print "%s %s by %s!"%(PRETTY_STAT[stat],change_text,change_val)
+			print "%s %s by %s!"%(PRETTY_STAT[changed_stat],change_text,change_val)
 
-	def not_dead():
+	def not_dead(self):
 		if self.hp > 0:
 			return True
 		else:
-			stat("day")
+			self.stat("day")
 			self.hp = int(self.vit/10)
 			self.gold = random.randrange(int(self.gold/2), self.gold)
 			self.hrs = random.randrange(1,10)
@@ -85,7 +85,7 @@ class Character(object):
 			cm("town")
 			town(self)
 
-	def requires(gold = 1, hours = 1, life = 1):
+	def requires(self, gold = 1, hours = 1, life = 1):
 		goldcheck = self.gold < gold
 		hourcheck = self.hrs < hours
 		lifecheck = self.hp < life
@@ -105,36 +105,53 @@ class Character(object):
 		else:
 			return True
 
-	def work(base, stat, factor):
+	def work(self, base, stat, factor):
 		added = int(math.floor(self.stat/factor))
 		earned = base + added
-		spend_gold(-earned)
+		self.spend_gold(-earned)
 
 	####
 	# STAT PRINTING
 	####
 
-	def print_useful(noskip = False):
+	def print_useful(self, noskip = False):
 		if noskip:
 			bar1 = 2
 		else:
 			bar1 = 0
-		print_bar(bar1)
+		print_bar(bar1)	
 		print "Day:                      %s" % self.day
 		print "Time Remaining:           %s hrs" % self.hrs
 		print "Life Remaining:           %s hp" % self.hp
 		print "Gold Remaining:           %s gold" % self.gold
 		print_bar(1)
 
-	def print_stat(stats, showtime = True):
+	def print_stat(self, stats, showtime = True):
 		global PRETTY_STAT
 		print_bar(0)
-		for stat in stats:
-			text = PRETTY_STAT[stat]
-			print "%s: %s" % (text, self.stat)
+		for a_stat in stats:
+			text = PRETTY_STAT[a_stat]
+			print "%s: %s" % (text, self.__dict__[a_stat])
 		if showtime:
 			print "Time: %s" % self.hrs
 		print_bar(1)
+
+
+	###
+	# GENERIC EVENT
+	###
+	def event(self, gold_req, time_req, life_req, message, stats, destination):
+		if self.requirements(gold_req, time_req, life_req):
+			print message
+			self.time_pass(time_req)
+			(None, self.spend_gold(gold_req))[gold_req > 0]
+			for field,change in stats:
+				self.stat(field, change)
+			to_print = [x for x in [gold_req, time_req, life_req] + stats if x > 0]
+			print_stat(to_print)
+		cm(destination)
+		eval(destination)(self)
+
 
 #################
 ##Text management
@@ -175,7 +192,7 @@ def print_bar(version):
 ##you could give an array or something if you wanted
 ##idk why you would
 ##wasting finger strokes
-def get_val(inputs):
+def get_val(inputs): 
 	inputs = inputs.lower()
 	val = getch().lower()
 	invalid = True
@@ -206,14 +223,15 @@ def load():
 		valid = True
 		if len(split_file)-1 == len(loaded_char.__dict__):
 			for line in split_file:
-				if "=" in line and line != "":
-					values = line.split("=")
-					if values[0] in Character().__dict__.keys():
-						this_val = values[1]
-						if values[0] != "name":
-							this_val = int(values[1])
-						loaded_char.values[0] = this_val
+				if "=" in line:
+					field, value = line.split("=")
+					if field in Character().__dict__.keys():
+						if field != "name":
+							value = int(value)
+						loaded_char.field = value
 					else:
+						print "Invalid field in save file %s" % field
+						# print Character().__dict__.keys()
 						valid = False		
 		else:
 			valid = False
@@ -242,7 +260,7 @@ def load():
 			NEW_GAME = True
 			cm()
 
-	except Exception, ErrorMessage:
+	except NameError, ErrorMessage:
 		print ErrorMessage
 		print "No save file found"
 		NEW_GAME = True
@@ -302,25 +320,24 @@ def town(chracter, refresh = True):
 	clear()
 	if refresh:
 		character.hrs = 16
-	def greeting():
-		print "Welcome to:"
-		print """
+	print "Welcome to:"
+	print """
   _____
  |_   _|____      ___ __             
    | |/ _ \ \ /\ / / '_ \            
    | | (_) \ V  V /| | | |           
    |_|\___/ \_/\_/ |_| |_|  
 		"""
-		character.print_useful()
-		print "Here you can do any of the following:"
-		print "Enter the Tavern          (T)"
-		print "Go to the Library         (L)"
-		print "Go to the Trainng Fields  (F)"
-		print "Visit the Blacksmith      (B)" 
-		print "Enter the Arena           (A)"
-		print "Save and/or exit the game (S)"
 
-	greeting()
+	character.print_useful()
+	print "Here you can do any of the following:"
+	print "Enter the Tavern          (T)"
+	print "Go to the Library         (L)"
+	print "Go to the Trainng Fields  (F)"
+	print "Visit the Blacksmith      (B)" 
+	print "Enter the Arena           (A)"
+	print "Save and/or exit the game (S)"
+
 	val = get_val("stlfba9")
 
 	if val == "s":
@@ -391,26 +408,29 @@ def tavern(character):
 	elif val == "b":
 		bartend(character)
 	elif val == "t":
-		town(False)
+		town(character, False)
 	else:
 		print "ERROR IN TAVERN SELECT"
 		cm()
 
-
 def eat(character):
-	if requires():
-		print "You order a big steak and devour it"
-		print "It's relieving after a long day"
-		heal = int(math.ceil(int(character.vit)/2))
-		character.stat("hp", heal)
-		character.spend_gold()
-		character.time_pass()
-		character.print_stat(["hp","gold"])
-	cm("tavern")
-	tavern(character)
+	gold_req, time_req, life_req = 1,1,0
+	message = "You order a big steak and devour it\nIt's relieving after a long day"
+	heal = int(math.ceil(int(character.vit)/2))
+	stats = [("hp", heal)]
+	destination = "tavern"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def drink(character):
-	if requires(1, 1, 1):
+	gold_req, time_req, life_req = 1,1,1
+	message = "You have a drink at the bar\nYou practice some dice and card games"
+	hurt = -int(math.ceil(character.vit/10))
+	stats = [("hp", hurt),("luck", 1)]
+	destination = "tavern"
+	character.event(requirements, message, time, stats, destination)
+
+def drink(character):
+	if character.requires(1, 1, 1):
 		print "You ask the bartender for a drink"
 		print "and drink it up in one gulp."
 		print "It's a little rough on the stomach,"
@@ -427,9 +447,8 @@ def drink(character):
 	else:
 		print "ERROR: broken direct in drink"
 
-def sleep():
-	if requires(0, 0, 0):
-		global MY_CHAR
+def sleep(character):
+	if character.requires(0, 0, 0):
 		print "You sleep for the night"
 		heal = int(math.ceil(int(character.vit)/4))
 		character.stat("hp", heal)
@@ -438,36 +457,31 @@ def sleep():
 		# print_stat(["day"])
 	cm("town")
 	town(character)
-	
-def gamble():
-	if requires():
-		global MY_CHAR
+
+def gamble(character):
+	if character.requires():
 		print "You play a hand of cards"
-		chance = random.randint(1+MY_CHAR["int"],1000)
+		chance = random.randint(1+character.luck,1000)
 		if chance > 900:
 			print 'You win!'
-			spend_gold(-10)
+			character.spend_gold(-10)
 		else:
 			print 'You lose.'
-			spend_gold()
+			character.spend_gold()
 
 		time_pass(1)
-		print_stat(["gold"])
+		character.print_stat(["gold"])
 	cm("tavern")
-	tavern()
+	tavern(character)
 
-def bartend():
-	if requires(0,8):
-		global MY_CHAR
+def bartend(character):
+	if character.requires(0,8):
 		print "You work at the bar for a few hours"
 		work(1, "luck", 3)
-		time_pass(8)
-		print_stat(["gold"])
+		character.time_pass(8)
+		character.print_stat(["gold"])
 	cm("tavern")
-	tavern()
-
-
-
+	tavern(character)
 
 
 ######################################
@@ -480,7 +494,7 @@ def bartend():
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
 
-def library():
+def library(character):
 	clear()
 	print "Welcome to the:"
 	print """
@@ -503,75 +517,70 @@ def library():
 	val = get_val("sbhrmt")
 	clear()
 	if val == "s":
-		study()
+		study(character)
 	elif val == "b":
-		book()
+		book(character)
 	elif val == "h":
-		tutor()
+		tutor(character)
 	elif val == "r":
-		read()
+		read(character)
 	elif val == "m":
-		magics()
+		magics(character)
 	elif val == "t":
-		town(False)
+		town(character,False)
 	else:
 		print "ERROR IN LIBRARY SELECT"
 		cm()
 
 
-def study():
-	if requires(0,1):
-		global MY_CHAR
+def study(character):
+	if character.requires(0,1):
 		print "You spend some time studying battle techniques,"
 		print "weapon varience, and the arcane arts."
-		time_pass()
-		stat("int")
-		print_stat(["int"])
+		character.time_pass()
+		character.stat("int")
+		character.print_stat(["int"])
 	cm("library")
-	library()
+	library(character)
 
-def book():
+def book(character):
 	if requires(1,3):
-		global MY_CHAR
 		print "You borrow and read a book of advanced"
 		print "fighting and magics"
-		time_pass(3)
-		stat("int", 4)
+		character.time_pass(3)
+		character.stat("int", 4)
 		print_stat(["int","gold"])
 	cm("library")
-	library()
+	library(character)
 
-def tutor():
-	if requires(3,3):
-		global MY_CHAR
+def tutor(character):
+	if character.requires(3,3):
 		print "You have an advanced wizard teach you"
 		print "some incredibly difficult magic"
-		time_pass(3)
-		stat("int", 7)
-		print_stat(["int","gold"])
+		character.time_pass(3)
+		character.stat("int", 7)
+		character.print_stat(["int","gold"])
 	cm("library")
-	library()
+	library(character)
 
 
-def read():
-	if requires(0):
-		global MY_CHAR
+def read(character):
+	if character.requires(0):
 		print "You read a nice fiction and rest"
-		time_pass(1)
-		stat("hp", 1)
-		print_stat(["hp"])
+		character.time_pass(1)
+		character.stat("hp", 1)
+		character.print_stat(["hp"])
 	cm("library")
-	library()
+	library(character)
 
-def magics():
+def magics(character):
 	if requires(0,8):
-		global MY_CHAR
 		print "You work a day teaching magic to others"
-		work(5, "int", 10)
-		time_pass(8)
-		print_stat(["gold"])
+		character.work(5, "int", 10)
+		character.time_pass(8)
+		character.print_stat(["gold"])
 	cm("library")
-	library()
+	library(character)
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -582,7 +591,7 @@ def magics():
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
-def fields():
+def fields(character):
 	clear()
 	print "Welcome to the:"
 	print """
@@ -605,77 +614,72 @@ def fields():
 
 	clear()
 	if val == "d":
-		dummy()
+		dummy(character)
 	elif val == "m":
-		master()
+		master(character)
 	elif val == "c":
-		course()
+		course(character)
 	elif val == "r":
-		race()
+		race(character)
 	elif val == "s":
-		show()
+		show(character)
 	elif val == "t":
-		town(False)
+		town(character, False)
 	else:
 		print "ERROR IN FIELDS SELECT"
 		cm()
 
 
-def dummy():
+def dummy(character):
 	if requires(0,2):
-		global MY_CHAR
 		print "You beat up a dummy for a nice work out."
-		time_pass(2)
-		stat("str")
-		print_stat(["str"])
+		character.time_pass(2)
+		character.stat("str")
+		character.print_stat(["str"])
 	cm("fields")
-	fields()
+	fields(character)
 
-def master():
+def master(character):
 	if requires(1,3,1):
-		global MY_CHAR
 		print "You spar a master trainer for some time."
 		print "He shows you a thing or two about fighting."
 		print "You take a few hits though."
-		time_pass(3)
-		stat("str", 6)
-		stat("hp", -1)
-		print_stat(["str","hp","gold"])
-	if not_dead():
+		character.time_pass(3)
+		character.stat("str", 6)
+		character.stat("hp", -1)
+		character.print_stat(["str","hp","gold"])
+	if character.not_dead():
 		cm("fields")
-		fields()
+		fields(character)
 	else:
 		print "ERROR: broken direct in master()"
 
-def course():
+def course(character):
 	if requires(0,2):
-		global MY_CHAR
 		print "You dash through obstacle course for a few hours"
-		time_pass(2)
-		stat("agil")
-		print_stat(["agil"])
+		character.time_pass(2)
+		character.stat("agil")
+		character.print_stat(["agil"])
 	cm("fields")
-	fields()
+	fields(character)
 
-def race():
+def race(character):
 	if requires(3,1):
-		global MY_CHAR
 		print "You run a race and it really works your muscles."
-		time_pass(1)
-		stat("agil", 3)
-		print_stat(["agil"])
+		character.time_pass(1)
+		character.stat("agil", 3)
+		character.print_stat(["agil"])
 	cm("fields")
-	fields()
+	fields(character)
 
-def show():
+def show(character):
 	if requires(0,8):
-		global MY_CHAR
 		print "You spend a day performing tricks"
-		work(3, "agil", 7)
-		time_pass(8)
-		print_stat(["gold"])
+		character.work(3, "agil", 7)
+		character.time_pass(8)
+		character.print_stat(["gold"])
 	cm("fields")
-	fields()
+	fields(character)
 
 
 ######################################
@@ -687,7 +691,7 @@ def show():
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
-def smith():
+def smith(character):
 	clear()
 	print "Welcome to the:"
 	print """
@@ -708,24 +712,23 @@ def smith():
 
 	clear()
 	if val == "w":
-		wepup()
+		wepup(character)
 	elif val == "a":
-		armup()
+		armup(character)
 	elif val == "f":
-		forge()
+		forge(character)
 	elif val == "t":
-		town(False)
+		town(character,False)
 	else:
 		print "ERROR IN FIELDS SELECT"
 		cm()
 
 
-def wepup():
-	global MY_CHAR
+def wepup(character):
 	clear()
-	cost = int(math.pow(10,MY_CHAR["wep"]))
+	cost = int(math.pow(10,character.wep))
 	print_bar(0)
-	print "Current weapon level:   %s"% MY_CHAR["wep"]
+	print "Current weapon level:   %s"% character.wep
 	print "Current upgrade cost:   %s gold" % cost
 	print_bar(1)
 	print "Would you like to upgrade your weapon? (y/n)"
@@ -733,21 +736,20 @@ def wepup():
 	val = get_val("yn")
 	clear()
 	if val == "y":
-		if requires(cost, 0):
+		if character.requires(cost, 0):
 			print "You upgrade your weapon."
-			stat("wep")
-			print_stat(["wep"])
+			character.stat("wep")
+			character.print_stat(["wep"])
 	elif val == "n":
 		print "You decide to save upgrading for later"
 	cm("smith")
-	smith()
+	smith(character)
 
-def armup():
-	global MY_CHAR
+def armup(character):
 	clear()
-	cost = int(math.pow(10,MY_CHAR["def"]))
+	cost = int(math.pow(10,character.defense))
 	print_bar(0)
-	print "Current armor level:    %s"% MY_CHAR["def"]
+	print "Current armor level:    %s"% character.defense
 	print "Current upgrade cost:   %sgold" % cost
 	print_bar(1)
 	print "Would you like to upgrade your armor? (y/n)"
@@ -756,24 +758,23 @@ def armup():
 	clear()
 
 	if val == "y":
-		if requires(cost, 0):
+		if character.requires(cost, 0):
 			print "You upgrade your armor."
-			stat("def")
-			print_stat(["def"])
+			character.stat("def")
+			character.print_stat(["def"])
 	elif val == "n":
 		print "You decide to save upgrading for later"
 	cm("smith")
-	smith()
+	smith(character)
 
-def forge():
+def forge(character):
 	if requires(0,8):
-		global MY_CHAR
 		print "You spend a day performing tricks"
-		work(10, "str", 10)
-		time_pass(8)
-		print_stat(["gold"])
+		character.work(10, "str", 10)
+		character.time_pass(8)
+		character.print_stat(["gold"])
 	cm("smith")
-	smith()
+	smith(character)
 
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -788,7 +789,7 @@ def forge():
 ######################################
 ## @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 ######################################
-def arena():
+def arena(character):
 	clear()
 	print "Welcome to the:"
 	print """
@@ -807,20 +808,20 @@ def arena():
 
 	clear()
 	if val == "f":
-		fight()
+		fight(character)
 	elif val == "t":
-		town(False)
+		town(character,False)
 	else:
 		print "ERROR IN ARENA SELECT"
 		cm()
 
-def fight():
-	if requires(0,1):
-		time_pass(1)
-		enemy = make_enemy(pick_diff())
-		battle(enemy)
+def fight(character):
+	if character.requires(0,1):
+		character.time_pass(1)
+		enemy = make_enemy(pick_diff(character))
+		battle(character, enemy)
 	cm()
-	town(False)
+	town(character, False)
 
 def enemy_range(diff, lvl):
 	if diff == 1:
@@ -846,13 +847,12 @@ def enemy_range(diff, lvl):
 		else:
 			return 0
 
-def pick_diff():
-	global MY_CHAR
-	range1 = enemy_range(1, MY_CHAR["lvl"])
-	range3 = range1 + enemy_range(3, MY_CHAR["lvl"])
-	range4 = range3 + enemy_range(4, MY_CHAR["lvl"])
-	range5 = range4 + enemy_range(5, MY_CHAR["lvl"])
-	range6 = range5 + enemy_range(6, MY_CHAR["lvl"])
+def pick_diff(character):
+	range1 = enemy_range(1, character.lvl)
+	range3 = range1 + enemy_range(3, character.lvl)
+	range4 = range3 + enemy_range(4, character.lvl)
+	range5 = range4 + enemy_range(5, character.lvl)
+	range6 = range5 + enemy_range(6, character.lvl)
 	pick = random.randint(1,100)
 	if pick < range1:
 		difficulty = 1  # 1/10
@@ -872,24 +872,22 @@ def make_enemy(diff):
 	global ENEMY_TYPES
 	return {'type':random.choice(ENEMY_TYPES[diff-1]), 'level': diff, 'hp': diff*1000 }
 
-def battle(enemy, message = "\n>"*4):
-	global MY_CHAR
-	battle_display(enemy, message)
+def battle(character, enemy, message = "\n>"*4):
+	battle_display(character, enemy, message)
 	val = get_val("ar")
 	clear()
 	if val == "a":
-		enemy, message = attack(enemy)
-		if not_dead():
-			battle(enemy, message)
+		enemy, message = attack(character, enemy)
+		if character.not_dead():
+			battle(character, enemy, message)
 		else:
 			print "Error in battle"
 	elif val == "r":
-		town(False)
+		town(character, False)
 	else:
 		print "ERROR IN BATTLE SELECT"
 
-def battle_display(enemy, message):
-	global MY_CHAR
+def battle_display(character, enemy, message):
 	print "-"*40
 	print "Enemy: %s" % enemy['type']
 	print "Level: %s" % enemy['level']
@@ -908,21 +906,19 @@ def battle_display(enemy, message):
 
 	print "\n"
 	print "-"*40
-	your_equals = int(math.ceil(float(MY_CHAR["hp"])/MY_CHAR["vit"]*25.0))
+	your_equals = int(math.ceil(float(character.hp)/character.vit*25.0))
 	your_healthbar = "[" + "="*your_equals+" "*(25-your_equals) + "]"
 	print "You:" 
-	print "HP: %s %s/%s" % (your_healthbar,MY_CHAR["hp"],MY_CHAR["vit"])
+	print "HP: %s %s/%s" % (your_healthbar,character.hp,character.vit)
 	print "-"*40
 
-def attack(enemy):
-	pass
-	global MY_CHAR
-	my_damage = damage_calc(MY_CHAR, char = True)
+def attack(character, enemy):
+	my_damage = damage_calc(character, char = True)
 	enemy_damage = damage_calc(enemy, char = False)
-	damage_to_me = damage_reduce(MY_CHAR,  enemy_damage, char = True)
+	damage_to_me = damage_reduce(character,  enemy_damage, char = True)
 	damage_to_enemy = damage_reduce(enemy, my_damage, char = False)
-	MY_CHAR["hp"] -= damage_to_me
-	MY_CHAR["hp"] = max(MY_CHAR["hp"],0) #SAFEGAURD AGAINST NEGATIVE HP
+	character.hp -= damage_to_me
+	character.hp = max(character.hp,0) #SAFEGAURD AGAINST NEGATIVE HP
 	enemy["hp"] -= damage_to_enemy
 	enemy["hp"] = max(enemy["hp"], 0)
 	message = """
@@ -935,8 +931,8 @@ def attack(enemy):
 def damage_calc(stats, char = True):
 	if char:
 		##TODO: balance, crits?
-		base = int(stats["wep"]*(5+stats["str"]+stats["int"]))
-		rand = random.randrange(int(stats["agil"]),1+int(stats["luck"]+stats["agil"]))
+		base = int(stats.wep*(5+stats.str+stats.int))
+		rand = random.randrange(int(stats.agil),1+int(stats.luck+stats.agil))
 		return random.randrange(base, base+rand)
 	else:
 		base = stats["level"] * 5
@@ -947,7 +943,7 @@ def damage_calc(stats, char = True):
 def damage_reduce(stats,damage, char = True):
 	#TODO: agi = Dodge?
 	if char:
-		return int(damage-stats["def"])
+		return int(damage-stats.defense)
 	else:
 		return int(damage)
 	
@@ -990,12 +986,12 @@ cm()
 clear()
 
 
-load()
+character = load()
 if NEW_GAME:
 	name = raw_input("What is your name?\n")
-	MY_CHAR["name"] = name
+	character.name = name
 	clear()
-	print "Greetings, %s" % MY_CHAR["name"]
+	print "Greetings, %s" % character.name
 	print "You are a mighty gladiator of the Emporer's Arena"
 	print "You are just starting out your gladiator career"
 	print "However the hard truth is that you are forced to fight"
@@ -1010,8 +1006,8 @@ if NEW_GAME:
 	print "Feel free to train in the fields, visit the smith and more"
 	print "The tavern has given you a permanent room. You can rest there"
 	cm("Press any key to proceed to Town.....")
-	town()
+	town(character)
 else:
-	print "Welcome back, %s" % MY_CHAR["name"]
+	print "Welcome back, %s" % character.name
 	cm("Press any key to proceed to Town.....")
 	town(False)
