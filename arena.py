@@ -2,9 +2,10 @@
 import random, time, os, sys, math
 from mygetch import *
 
+# TODO PICKLE
 # DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":1, "wep":1, "luck":0, "day":0, "hrs": 10}
 # MY_CHAR = DEFAULT_CHAR
-PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "def":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day"}
+PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "defense":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day", "hrs":"Hours"}
 ENEMY_TYPES = [["Peasant"], ["Fighter", "Thief", "Apprentice"], ["Warrior", "Ranger", "Mage"], ["Paladin", "Assassin", "Wizard]"], ["Minotaur", "Ninja", "Archon"], ["Shadow"]]
 
 
@@ -68,8 +69,10 @@ class Character(object):
 		if changed_stat == "day":
 			pass_print = True
 
-		if not pass_print:
+		if not pass_print and changed_stat != "hrs":
 			print "%s %s by %s!"%(PRETTY_STAT[changed_stat],change_text,change_val)
+		elif changed_stat == "hrs":
+			print "%s hour(s) passed!" % change
 
 	def not_dead(self):
 		if self.hp > 0:
@@ -105,8 +108,8 @@ class Character(object):
 		else:
 			return True
 
-	def work(self, base, stat, factor):
-		added = int(math.floor(self.stat/factor))
+	def work(self, base, scale_stat, factor):
+		added = int(math.floor(self.__dict__[scale_stat]/factor))
 		earned = base + added
 		self.spend_gold(-earned)
 
@@ -140,17 +143,23 @@ class Character(object):
 	###
 	# GENERIC EVENT
 	###
-	def event(self, gold_req, time_req, life_req, message, stats, destination):
-		if self.requirements(gold_req, time_req, life_req):
+
+	def event(self, gold_req, time_req, life_req, message, stats, destination, printing = True):
+		if self.requires(gold_req, time_req, life_req):
 			print message
 			self.time_pass(time_req)
 			(None, self.spend_gold(gold_req))[gold_req > 0]
 			for field,change in stats:
 				self.stat(field, change)
-			to_print = [x for x in [gold_req, time_req, life_req] + stats if x > 0]
-			print_stat(to_print)
-		cm(destination)
-		eval(destination)(self)
+			if printing:
+				to_print = [a_stat for a_stat,a_val in [("gold",gold_req), ("hrs", time_req), ("hp",life_req)] + stats if a_val > 0]
+				# print to_print
+				self.print_stat(to_print)
+		if self.not_dead():
+			cm(destination)
+			eval(destination)(self)
+		else:
+			print "ERROR IN EVENT RETURN: %s" % self
 
 
 #################
@@ -228,7 +237,7 @@ def load():
 					if field in Character().__dict__.keys():
 						if field != "name":
 							value = int(value)
-						loaded_char.field = value
+						loaded_char.__dict__[field] = value
 					else:
 						print "Invalid field in save file %s" % field
 						# print Character().__dict__.keys()
@@ -275,6 +284,7 @@ def load():
 def save_prompt(character):
 	clear()
 	print """
+
   ____                               
  / ___|  __ ___   _____              
  \___ \ / _` \ \ / / _ \             
@@ -427,25 +437,7 @@ def drink(character):
 	hurt = -int(math.ceil(character.vit/10))
 	stats = [("hp", hurt),("luck", 1)]
 	destination = "tavern"
-	character.event(requirements, message, time, stats, destination)
-
-def drink(character):
-	if character.requires(1, 1, 1):
-		print "You ask the bartender for a drink"
-		print "and drink it up in one gulp."
-		print "It's a little rough on the stomach,"
-		print "but you feel a little bit luckier"
-		hurt = -int(math.ceil(character.vit/10))
-		character.stat("hp", hurt)
-		character.stat("luck")
-		character.spend_gold()
-		character.time_pass()
-		character.print_stat(["hp","luck", "gold"])
-	if character.not_dead():
-		cm("tavern")
-		tavern(character)
-	else:
-		print "ERROR: broken direct in drink"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def sleep(character):
 	if character.requires(0, 0, 0):
@@ -453,8 +445,6 @@ def sleep(character):
 		heal = int(math.ceil(int(character.vit)/4))
 		character.stat("hp", heal)
 		character.stat("day")
-		# print_stat(["hp"])
-		# print_stat(["day"])
 	cm("town")
 	town(character)
 
@@ -469,7 +459,7 @@ def gamble(character):
 			print 'You lose.'
 			character.spend_gold()
 
-		time_pass(1)
+		character.time_pass(1)
 		character.print_stat(["gold"])
 	cm("tavern")
 	tavern(character)
@@ -477,7 +467,7 @@ def gamble(character):
 def bartend(character):
 	if character.requires(0,8):
 		print "You work at the bar for a few hours"
-		work(1, "luck", 3)
+		character.work(1, "luck", 3)
 		character.time_pass(8)
 		character.print_stat(["gold"])
 	cm("tavern")
@@ -505,7 +495,7 @@ def library(character):
  |_____|_|_.__/|_|  \__,_|_|   \__, |
                                 |___/ 
 """
-	print_useful(True)
+	character.print_useful(True)
 	print "Here you can do any of the following:"
 	print "Study Magics              (S)  --  1hr"
 	print "Borrow a book             (B)  1g  3hr"
@@ -544,12 +534,12 @@ def study(character):
 	library(character)
 
 def book(character):
-	if requires(1,3):
+	if character.requires(1,3):
 		print "You borrow and read a book of advanced"
 		print "fighting and magics"
 		character.time_pass(3)
 		character.stat("int", 4)
-		print_stat(["int","gold"])
+		character.print_stat(["int","gold"])
 	cm("library")
 	library(character)
 
@@ -574,7 +564,7 @@ def read(character):
 	library(character)
 
 def magics(character):
-	if requires(0,8):
+	if character.requires(0,8):
 		print "You work a day teaching magic to others"
 		character.work(5, "int", 10)
 		character.time_pass(8)
@@ -631,7 +621,7 @@ def fields(character):
 
 
 def dummy(character):
-	if requires(0,2):
+	if character.requires(0,2):
 		print "You beat up a dummy for a nice work out."
 		character.time_pass(2)
 		character.stat("str")
@@ -640,7 +630,7 @@ def dummy(character):
 	fields(character)
 
 def master(character):
-	if requires(1,3,1):
+	if character.requires(1,3,1):
 		print "You spar a master trainer for some time."
 		print "He shows you a thing or two about fighting."
 		print "You take a few hits though."
@@ -655,7 +645,7 @@ def master(character):
 		print "ERROR: broken direct in master()"
 
 def course(character):
-	if requires(0,2):
+	if character.requires(0,2):
 		print "You dash through obstacle course for a few hours"
 		character.time_pass(2)
 		character.stat("agil")
@@ -664,7 +654,7 @@ def course(character):
 	fields(character)
 
 def race(character):
-	if requires(3,1):
+	if character.requires(3,1):
 		print "You run a race and it really works your muscles."
 		character.time_pass(1)
 		character.stat("agil", 3)
@@ -673,7 +663,7 @@ def race(character):
 	fields(character)
 
 def show(character):
-	if requires(0,8):
+	if character.requires(0,8):
 		print "You spend a day performing tricks"
 		character.work(3, "agil", 7)
 		character.time_pass(8)
@@ -750,7 +740,7 @@ def armup(character):
 	cost = int(math.pow(10,character.defense))
 	print_bar(0)
 	print "Current armor level:    %s"% character.defense
-	print "Current upgrade cost:   %sgold" % cost
+	print "Current upgrade cost:   %s gold" % cost
 	print_bar(1)
 	print "Would you like to upgrade your armor? (y/n)"
 
@@ -760,16 +750,16 @@ def armup(character):
 	if val == "y":
 		if character.requires(cost, 0):
 			print "You upgrade your armor."
-			character.stat("def")
-			character.print_stat(["def"])
+			character.stat("defense")
+			character.print_stat(["defense"])
 	elif val == "n":
 		print "You decide to save upgrading for later"
 	cm("smith")
 	smith(character)
 
 def forge(character):
-	if requires(0,8):
-		print "You spend a day performing tricks"
+	if character.requires(0,8):
+		print "You forging weapons and armor"
 		character.work(10, "str", 10)
 		character.time_pass(8)
 		character.print_stat(["gold"])
@@ -891,8 +881,7 @@ def battle_display(character, enemy, message):
 	print "-"*40
 	print "Enemy: %s" % enemy['type']
 	print "Level: %s" % enemy['level']
-	equals = int(math.ceil(enemy["hp"]/(enemy['level']*1000.0)*25.0))
-	print equals
+	equals = min(int(math.ceil(enemy["hp"]/(enemy['level']*1000.0)*25.0)), 25)
 	healthbar = "[" + "="*equals+" "*(25-equals) + "]"
 	print "HP: %s" % healthbar
 	print "-"*40
@@ -906,7 +895,7 @@ def battle_display(character, enemy, message):
 
 	print "\n"
 	print "-"*40
-	your_equals = int(math.ceil(float(character.hp)/character.vit*25.0))
+	your_equals = min(int(math.ceil(float(character.hp)/character.vit*25.0)), 25)
 	your_healthbar = "[" + "="*your_equals+" "*(25-your_equals) + "]"
 	print "You:" 
 	print "HP: %s %s/%s" % (your_healthbar,character.hp,character.vit)
