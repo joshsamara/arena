@@ -5,7 +5,21 @@ from mygetch import *
 PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "defense":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day", "hrs":"Hours"}
 ENEMY_TYPES = [["Peasant"], ["Fighter", "Thief", "Apprentice"], ["Warrior", "Ranger", "Mage"], ["Paladin", "Assassin", "Wizard]"], ["Minotaur", "Ninja", "Archon"], ["Shadow"]]
 
-
+#TODO LIST:
+# Generic work function
+# Vitality training (smith?)
+# Leveling up/xp system + rewards
+# Color printing?
+# Decide: All functions in character class vs wrapper class vs ???
+# # # # ^ Split into multiple files? based on this -> better organization
+# Work Function
+# Balance
+# End Game
+# More comments!
+# Windows compatibility (independent app?)
+# Pickle for saving
+# Better intro
+# Version next: Graphics (Pygame, PyGTK)?
 
 class Character(object):
 	"""Stats and functions for a players Character"""
@@ -154,7 +168,7 @@ class Character(object):
 				self.print_stat(to_print)
 		if self.not_dead():
 			cm(destination)
-			eval(destination)(self)
+			eval(destination)(self) ##TODO: FIX THIS. WHO DOES THIS.
 		else:
 			print "ERROR IN EVENT RETURN: %s" % self
 
@@ -931,7 +945,7 @@ intro ="""___________________________________________________
 
  		        
                  A Gladiator's Tale  
--===========]=        Beta 0.1       =[===========-
+-===========]=        Beta 0.7       =[===========-
                    By Josh Samara
 ___________________________________________________"""
 
