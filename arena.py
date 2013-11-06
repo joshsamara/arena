@@ -2,9 +2,6 @@
 import random, time, os, sys, math
 from mygetch import *
 
-# TODO PICKLE
-# DEFAULT_CHAR = {"name":"", "lvl":0 , "xp":0, "gold":10, "hp":10, "str":10, "int":10, "agil":10, "vit":10, "def":1, "wep":1, "luck":0, "day":0, "hrs": 10}
-# MY_CHAR = DEFAULT_CHAR
 PRETTY_STAT = {"name":"Name", "lvl":"Lvl." , "xp":"Exp.", "gold":"Gold", "hp":"Life", "str":"Str.", "int":"Int.", "agil":"Agi.", "vit":"Vit.", "defense":"Armor Level", "wep":"Weapon Level", "luck":"Luck", "day":"Day", "hrs":"Hours"}
 ENEMY_TYPES = [["Peasant"], ["Fighter", "Thief", "Apprentice"], ["Warrior", "Ranger", "Mage"], ["Paladin", "Assassin", "Wizard]"], ["Minotaur", "Ninja", "Archon"], ["Shadow"]]
 
@@ -458,7 +455,6 @@ def gamble(character):
 		else:
 			print 'You lose.'
 			character.spend_gold()
-
 		character.time_pass(1)
 		character.print_stat(["gold"])
 	cm("tavern")
@@ -522,46 +518,34 @@ def library(character):
 		print "ERROR IN LIBRARY SELECT"
 		cm()
 
-
 def study(character):
-	if character.requires(0,1):
-		print "You spend some time studying battle techniques,"
-		print "weapon varience, and the arcane arts."
-		character.time_pass()
-		character.stat("int")
-		character.print_stat(["int"])
-	cm("library")
-	library(character)
+	gold_req, time_req, life_req = 0,1,0
+	message = "You spend some time studying battle techniques,\nand the arcane arts."
+	stats = [("int", 1)]
+	destination = "library"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def book(character):
-	if character.requires(1,3):
-		print "You borrow and read a book of advanced"
-		print "fighting and magics"
-		character.time_pass(3)
-		character.stat("int", 4)
-		character.print_stat(["int","gold"])
-	cm("library")
-	library(character)
+	gold_req, time_req, life_req = 1,3,0
+	message = "You borrow and read a book of advanced\nfighting and magics"
+	stats = [("int", 4)]
+	destination = "library"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def tutor(character):
-	if character.requires(3,3):
-		print "You have an advanced wizard teach you"
-		print "some incredibly difficult magic"
-		character.time_pass(3)
-		character.stat("int", 7)
-		character.print_stat(["int","gold"])
-	cm("library")
-	library(character)
-
+	gold_req, time_req, life_req = 3,3,0
+	message = "You have an advanced wizard teach you\nsome incredibly difficult magic"
+	stats = [("int", 7)]
+	destination = "library"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def read(character):
-	if character.requires(0):
-		print "You read a nice fiction and rest"
-		character.time_pass(1)
-		character.stat("hp", 1)
-		character.print_stat(["hp"])
-	cm("library")
-	library(character)
+	gold_req, time_req, life_req = 0,1,0
+	message = "You read a nice fiction book and rest"
+	heal = int(math.ceil(int(character.vit)/10))
+	stats = [("hp", heal)]
+	destination = "library"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def magics(character):
 	if character.requires(0,8):
@@ -619,48 +603,33 @@ def fields(character):
 		print "ERROR IN FIELDS SELECT"
 		cm()
 
-
 def dummy(character):
-	if character.requires(0,2):
-		print "You beat up a dummy for a nice work out."
-		character.time_pass(2)
-		character.stat("str")
-		character.print_stat(["str"])
-	cm("fields")
-	fields(character)
+	gold_req, time_req, life_req = 0,2,0
+	message = "You beat up a dummy for a nice work out."
+	stats = [("str", 1)]
+	destination = "fields"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def master(character):
-	if character.requires(1,3,1):
-		print "You spar a master trainer for some time."
-		print "He shows you a thing or two about fighting."
-		print "You take a few hits though."
-		character.time_pass(3)
-		character.stat("str", 6)
-		character.stat("hp", -1)
-		character.print_stat(["str","hp","gold"])
-	if character.not_dead():
-		cm("fields")
-		fields(character)
-	else:
-		print "ERROR: broken direct in master()"
+	gold_req, time_req, life_req = 1,3,1
+	message = "You spar a master trainer for some time.\nHe shows you a thing or two about fighting.\nYou take a few hits though."
+	stats = [("str", 6)]
+	destination = "fields"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def course(character):
-	if character.requires(0,2):
-		print "You dash through obstacle course for a few hours"
-		character.time_pass(2)
-		character.stat("agil")
-		character.print_stat(["agil"])
-	cm("fields")
-	fields(character)
+	gold_req, time_req, life_req = 0,2,0
+	message = "You dash through obstacle course for a few hours"
+	stats = [("agil", 1)]
+	destination = "fields"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def race(character):
-	if character.requires(3,1):
-		print "You run a race and it really works your muscles."
-		character.time_pass(1)
-		character.stat("agil", 3)
-		character.print_stat(["agil"])
-	cm("fields")
-	fields(character)
+	gold_req, time_req, life_req = 3,1,0
+	message = "You run a race and it really works your muscles."
+	stats = [("agil", 3)]
+	destination = "fields"
+	character.event(gold_req, time_req, life_req, message, stats, destination)
 
 def show(character):
 	if character.requires(0,8):
