@@ -224,10 +224,10 @@ class Character(object):
 #
 
 
-def town(self, refresh=True):
-    clear()
-    if refresh:
-        self.hrs = 16
+    def town(self, refresh=True):
+        clear()
+        if refresh:
+            self.hrs = 16
     print "Welcome to:"
     print """
   _____
@@ -237,37 +237,37 @@ def town(self, refresh=True):
    |_|\___/ \_/\_/ |_| |_|  
 """
 
-    self.print_useful()
-    print "Here you can do any of the following:"
-    print "Enter the Tavern          (T)"
-    print "Go to the Library         (L)"
-    print "Go to the Trainng Fields  (F)"
-    print "Visit the Blacksmith      (B)"
-    print "Enter the Arena           (A)"
-    print "Save and/or exit the game (S)"
+        self.print_useful()
+        print "Here you can do any of the following:"
+        print "Enter the Tavern          (T)"
+        print "Go to the Library         (L)"
+        print "Go to the Trainng Fields  (F)"
+        print "Visit the Blacksmith      (B)"
+        print "Enter the Arena           (A)"
+        print "Save and/or exit the game (S)"
 
-    val = get_val("stlfba9")
+        val = get_val("stlfba9")
 
-    if val == "s":
+        if val == "s":
+            self.save_prompt()
+        elif val == "t":
+            tavern(self)
+        elif val == "l":
+            library(self)
+        elif val == "f":
+            fields(self)
+        elif val == "b":
+            smith(self)
+        elif val == "a":
+            arena(self)
+        elif val == "9":
+            self.gold += 100
+            self.hrs += 100
+            self.hp += 100
+        else:
+            print "ERROR IN TOWN SELECT"
+            cm()
         self.save_prompt()
-    elif val == "t":
-        tavern(self)
-    elif val == "l":
-        library(self)
-    elif val == "f":
-        fields(self)
-    elif val == "b":
-        smith(self)
-    elif val == "a":
-        arena(self)
-    elif val == "9":
-        self.gold += 100
-        self.hrs += 100
-        self.hp += 100
-    else:
-        print "ERROR IN TOWN SELECT"
-        cm()
-    self.save_prompt()
 
 
 def load():
