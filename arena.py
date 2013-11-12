@@ -212,11 +212,11 @@ class Character(object):
         clear()
         print """
 
-  ____
- / ___|  __ ___   _____
- \___ \ / _` \ \ / / _ \
-  ___) | (_| |\ V /  __/
- |____/ \__, _| \_/ \___|
+  ____                               
+ / ___|  __ ___   _____              
+ \___ \ / _` \ \ / / _ \             
+  ___) | (_| |\ V /  __/             
+ |____/ \__,_| \_/ \___|  
  """
 
         print_bar(0)
@@ -384,11 +384,11 @@ def town(chracter, refresh=True):
     print "Welcome to:"
     print """
   _____
- |_   _|____      ___ __
-   | |/ _ \ \ /\ / / '_ \
-   | | (_) \ V  V /| | | |
-   |_|\___/ \_/\_/ |_| |_|
-        """
+ |_   _|____      ___ __             
+   | |/ _ \ \ /\ / / '_ \            
+   | | (_) \ V  V /| | | |           
+   |_|\___/ \_/\_/ |_| |_|  
+"""
 
     character.print_useful()
     print "Here you can do any of the following:"
@@ -442,12 +442,12 @@ def tavern(character):
     clear()
     print "Welcome to the:"
     print """
-  _____
- |_   _|_ ___   _____ _ __ _ __
-   | |/ _` \ \ / / _ \ '__| '_ \
-   | | (_| |\ V /  __/ |  | | | |
-   |_|\__, _| \_/ \___|_|  |_| |_|
-    """
+  _____ 
+ |_   _|_ ___   _____ _ __ _ __      
+   | |/ _` \ \ / / _ \ '__| '_ \     
+   | | (_| |\ V /  __/ |  | | | |    
+   |_|\__,_| \_/ \___|_|  |_| |_| 
+"""
     character.print_useful()
     print "Here you can do any of the following:"
     print "Buy a Meal                (M)  1g  1hr"
@@ -545,11 +545,11 @@ def library(character):
     print "Welcome to the:"
     print """
   _       _
- | |   (_) |__  _ __ __ _ _ __ _   _
+ | |   (_) |__  _ __ __ _ _ __ _   _ 
  | |   | | '_ \| '__/ _` | '__| | | |
  | |___| | |_) | | | (_| | |  | |_| |
- |_____|_|_.__/|_|  \__, _|_|   \__, |
-                                |___/
+ |_____|_|_.__/|_|  \__,_|_|   \__, |
+                                |___/ 
 """
     character.print_useful(True)
     print "Here you can do any of the following:"
@@ -637,10 +637,10 @@ def fields(character):
     print "Welcome to the:"
     print """
   _____        _     _
- |  ___(_) ___| | __| |___
- | |_  | |/ _ \ |/ _` / __|
- |  _| | |  __/ | (_| \__ \
- |_|   |_|\___|_|\__, _|___/
+ |  ___(_) ___| | __| |___           
+ | |_  | |/ _ \ |/ _` / __|          
+ |  _| | |  __/ | (_| \__ \          
+ |_|   |_|\___|_|\__,_|___/         
  """
     character.print_useful()
     print "Here you can do any of the following:"
@@ -726,11 +726,11 @@ def smith(character):
     clear()
     print "Welcome to the:"
     print """
-  ____            _ _   _
- / ___| _ __ ___ (_) |_| |__
- \___ \| '_ ` _ \| | __| '_ \
-  ___) | | | | | | | |_| | | |
- |____/|_|_|_| |_|_|\__|_| |_|
+  ____            _ _   _            
+ / ___| _ __ ___ (_) |_| |__         
+ \___ \| '_ ` _ \| | __| '_ \        
+  ___) | | | | | | | |_| | | |       
+ |____/|_|_|_| |_|_|\__|_| |_|        
  """
     character.print_useful()
     print "Here you can do any of the following:"
@@ -828,11 +828,11 @@ def arena(character):
     clear()
     print "Welcome to the:"
     print """
-     _
-    / \\   _ __ ___ _ __   __ _
+     _                         
+    / \\   _ __ ___ _ __   __ _ 
    / _ \\ | '__/ _ \\ '_ \\ / _` |
   / ___ \\| | |  __/ | | | (_| |
- /_/   \\_\\_|  \\___|_| |_|\\__, _|
+ /_/   \\_\\_|  \\___|_| |_|\\__,_| 
  """
     character.print_useful()
     print "Here you must either fight or return to town"
