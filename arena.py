@@ -1,40 +1,9 @@
 #!/usr/bin/python
 import random
 import time
-import os
-import sys
 import math
-from mygetch import *
+from common import *
 
-PRETTY_STAT = {
-    "name": "Name",
-    "lvl": "Lvl.",
-    "xp": "Exp.",
-    "gold": "Gold",
-    "hp": "Life",
-    "str": "Str.",
-    "int": "Int.",
-    "agil": "Agi.",
-    "vit": "Vit.",
-    "defense": "Armor Level",
-    "wep": "Weapon Level",
-    "luck": "Luck",
-    "day": "Day",
-    "hrs": "Hours"}
-ENEMY_TYPES = [["Peasant"],
-               ["Fighter",
-                "Thief",
-                "Apprentice"],
-               ["Warrior",
-                "Ranger",
-                "Mage"],
-               ["Paladin",
-                "Assassin",
-                "Wizard]"],
-               ["Minotaur",
-                "Ninja",
-                "Archon"],
-               ["Shadow"]]
 
 # TODO LIST:
 # Generic work function
@@ -217,7 +186,7 @@ class Character(object):
  \___ \ / _` \ \ / / _ \             
   ___) | (_| |\ V /  __/             
  |____/ \__,_| \_/ \___|  
- """
+"""
 
         print_bar(0)
         print "Name:  %s" % self.name
@@ -243,63 +212,62 @@ class Character(object):
         if "r" == val:
             town(self, False)
 
+        
 #
-# Text management
+# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 #
-def cm(text=None):
-    if text is None:
-        print "Press any key to continue..."
-    elif text is not None:
-        if text.lower() == "tavern":
-            print "\nPress any key to retun to the Tavern..."
-        elif text.lower() == "library":
-            print "\nPress any key to retun to the Library..."
-        elif text.lower() == "town":
-            print "\nPress any key to retun to Town..."
-        elif text.lower() == "fields":
-            print "\nPress any key to retun to the Fields.."
-        elif text.lower() == "smith":
-            print "\nPress any key to retun to the Blacksmith.."
-    else:
-        print text
-    getch()
+
+# Town
+
+#
+# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
+#
 
 
-def clear():
-    os.system('clear')
-
-
-def print_bar(version):
-    if version == 0:
-        print "\n#################################"
-    elif version == 1:
-        print "#################################\n"
-    else:
-        print "#################################"
-
-
-# just give a string of valid inputs
-# you could give an array or something if you wanted
-# idk why you would
-# wasting finger strokes
-def get_val(inputs):
-    inputs = inputs.lower()
-    val = getch().lower()
-    invalid = True
-    for char in inputs:
-        invalid = invalid and not char in val
-
-    if invalid:
-        print ".",
-        val = get_val(inputs)
+def town(self, refresh=True):
     clear()
-    return val
+    if refresh:
+        self.hrs = 16
+    print "Welcome to:"
+    print """
+  _____
+ |_   _|____      ___ __             
+   | |/ _ \ \ /\ / / '_ \            
+   | | (_) \ V  V /| | | |           
+   |_|\___/ \_/\_/ |_| |_|  
+"""
 
-#
-# File management
-#
-global NEW_GAME
-NEW_GAME = True
+    self.print_useful()
+    print "Here you can do any of the following:"
+    print "Enter the Tavern          (T)"
+    print "Go to the Library         (L)"
+    print "Go to the Trainng Fields  (F)"
+    print "Visit the Blacksmith      (B)"
+    print "Enter the Arena           (A)"
+    print "Save and/or exit the game (S)"
+
+    val = get_val("stlfba9")
+
+    if val == "s":
+        self.save_prompt()
+    elif val == "t":
+        tavern(self)
+    elif val == "l":
+        library(self)
+    elif val == "f":
+        fields(self)
+    elif val == "b":
+        smith(self)
+    elif val == "a":
+        arena(self)
+    elif val == "9":
+        self.gold += 100
+        self.hrs += 100
+        self.hp += 100
+    else:
+        print "ERROR IN TOWN SELECT"
+        cm()
+    self.save_prompt()
 
 
 def load():
@@ -363,69 +331,6 @@ def load():
     else:
         return Character()
 
-
-
-
-#
-# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-#
-
-# Town
-
-#
-# @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-#
-
-
-def town(chracter, refresh=True):
-    clear()
-    if refresh:
-        character.hrs = 16
-    print "Welcome to:"
-    print """
-  _____
- |_   _|____      ___ __             
-   | |/ _ \ \ /\ / / '_ \            
-   | | (_) \ V  V /| | | |           
-   |_|\___/ \_/\_/ |_| |_|  
-"""
-
-    character.print_useful()
-    print "Here you can do any of the following:"
-    print "Enter the Tavern          (T)"
-    print "Go to the Library         (L)"
-    print "Go to the Trainng Fields  (F)"
-    print "Visit the Blacksmith      (B)"
-    print "Enter the Arena           (A)"
-    print "Save and/or exit the game (S)"
-
-    val = get_val("stlfba9")
-
-    if val == "s":
-        character.save_prompt()
-    elif val == "t":
-        tavern(character)
-    elif val == "l":
-        library(character)
-    elif val == "f":
-        fields(character)
-    elif val == "b":
-        smith(character)
-    elif val == "a":
-        arena(character)
-    elif val == "9":
-        character.gold += 100
-        character.hrs += 100
-        character.hp += 100
-    else:
-        print "ERROR IN TOWN SELECT"
-        cm()
-    character.save_prompt()
-
-
-def exit():
-    print "Goodbye"
-    sys.exit()
 
 #
 # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
