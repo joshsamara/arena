@@ -183,9 +183,11 @@ class Character(object):
             print "Time: %s" % self.hrs
         print_bar(1)
 
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     #
-    # GENERIC EVENTS
+    # GENERIC EVENT TEMPLATE
     #
+    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     def event(self, gold_req, time_req, life_req, message,
               stats, destination, printing=True):
         if self.requires(gold_req, time_req, life_req):
@@ -205,6 +207,41 @@ class Character(object):
         else:
             print "ERROR IN EVENT RETURN: %s" % self
 
+
+    def save_prompt(self):
+        clear()
+        print """
+
+  ____
+ / ___|  __ ___   _____
+ \___ \ / _` \ \ / / _ \
+  ___) | (_| |\ V /  __/
+ |____/ \__, _| \_/ \___|
+ """
+
+        print_bar(0)
+        print "Name:  %s" % self.name
+        print "Level: %s" % self.lvl
+        print "Gold:  %s" % self.gold
+        print "Day:   %s" % self.day
+        print_bar(1)
+        print "Would you like to save?"
+        print "Press Q to exit, S to save, E to save and exit, or R to return"
+        val = get_val("qsre")
+
+        if "s" == val:
+            self.save()
+            town(self, False)
+
+        if "e" == val:
+            self.save()
+            exit()
+
+        if "q" == val:
+            exit()
+
+        if "r" == val:
+            town(self, False)
 
 #
 # Text management
@@ -327,40 +364,7 @@ def load():
         return Character()
 
 
-def save_prompt(character):
-    clear()
-    print """
 
-  ____
- / ___|  __ ___   _____
- \___ \ / _` \ \ / / _ \
-  ___) | (_| |\ V /  __/
- |____/ \__, _| \_/ \___|
- """
-
-    print_bar(0)
-    print "Name:  %s" % character.name
-    print "Level: %s" % character.lvl
-    print "Gold:  %s" % character.gold
-    print "Day:   %s" % character.day
-    print_bar(1)
-    print "Would you like to save?"
-    print "Press Q to exit, S to save, E to save and exit, or R to return"
-    val = get_val("qsre")
-
-    if "s" == val:
-        character.save()
-        town(character, False)
-
-    if "e" == val:
-        character.save()
-        exit()
-
-    if "q" == val:
-        exit()
-
-    if "r" == val:
-        town(character, False)
 
 #
 # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -398,7 +402,7 @@ def town(chracter, refresh=True):
     val = get_val("stlfba9")
 
     if val == "s":
-        save_prompt(character)
+        character.save_prompt()
     elif val == "t":
         tavern(character)
     elif val == "l":
@@ -416,7 +420,7 @@ def town(chracter, refresh=True):
     else:
         print "ERROR IN TOWN SELECT"
         cm()
-    save_prompt(character)
+    character.save_prompt()
 
 
 def exit():
