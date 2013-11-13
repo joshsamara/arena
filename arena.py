@@ -200,7 +200,7 @@ class Character(object):
 
         if "s" == val:
             self.save()
-            town(self, False)
+            self.town(False)
 
         if "e" == val:
             self.save()
@@ -210,7 +210,7 @@ class Character(object):
             exit()
 
         if "r" == val:
-            town(self, False)
+            self.town(False)
 
         
 #
@@ -228,14 +228,14 @@ class Character(object):
         clear()
         if refresh:
             self.hrs = 16
-    print "Welcome to:"
-    print """
+        print "Welcome to:"
+        print """
   _____
  |_   _|____      ___ __             
    | |/ _ \ \ /\ / / '_ \            
    | | (_) \ V  V /| | | |           
    |_|\___/ \_/\_/ |_| |_|  
-"""
+    """
 
         self.print_useful()
         print "Here you can do any of the following:"
@@ -375,7 +375,7 @@ def tavern(character):
     elif val == "b":
         bartend(character)
     elif val == "t":
-        town(character, False)
+        character.town(False)
     else:
         print "ERROR IN TAVERN SELECT"
         cm()
@@ -406,7 +406,7 @@ def sleep(character):
         character.stat("hp", heal)
         character.stat("day")
     cm("town")
-    town(character)
+    character.town()
 
 
 def gamble(character):
@@ -478,7 +478,7 @@ def library(character):
     elif val == "m":
         magics(character)
     elif val == "t":
-        town(character, False)
+        character.town(False)
     else:
         print "ERROR IN LIBRARY SELECT"
         cm()
@@ -570,7 +570,7 @@ def fields(character):
     elif val == "s":
         show(character)
     elif val == "t":
-        town(character, False)
+        character.town(False)
     else:
         print "ERROR IN FIELDS SELECT"
         cm()
@@ -654,7 +654,7 @@ def smith(character):
     elif val == "f":
         forge(character)
     elif val == "t":
-        town(character, False)
+        character.town(False)
     else:
         print "ERROR IN FIELDS SELECT"
         cm()
@@ -750,7 +750,7 @@ def arena(character):
     if val == "f":
         fight(character)
     elif val == "t":
-        town(character, False)
+        character.town(False)
     else:
         print "ERROR IN ARENA SELECT"
         cm()
@@ -762,7 +762,7 @@ def fight(character):
         enemy = make_enemy(pick_diff(character))
         battle(character, enemy)
     cm()
-    town(character, False)
+    character.town(False)
 
 
 def enemy_range(diff, lvl):
@@ -833,7 +833,7 @@ def battle(character, enemy, message="\n>" * 4):
         else:
             print "Error in battle"
     elif val == "r":
-        town(character, False)
+        character.town(False)
     else:
         print "ERROR IN BATTLE SELECT"
 
@@ -964,8 +964,8 @@ if NEW_GAME:
     print "Feel free to train in the fields, visit the smith and more"
     print "The tavern has given you a permanent room. You can rest there"
     cm("Press any key to proceed to Town.....")
-    town(character)
+    character.town()
 else:
     print "Welcome back, %s" % character.name
     cm("Press any key to proceed to Town.....")
-    town(False)
+    character.town(False)
