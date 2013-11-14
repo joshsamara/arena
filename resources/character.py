@@ -3,8 +3,6 @@ import time
 import math
 from common import *
 
-
-
 class Character(object):
 
     """Stats and functions for a players Character"""
@@ -27,7 +25,7 @@ class Character(object):
         self.hrs = 10
 
     def save(self):
-        save_file = open('arena.save', 'w')
+        save_file = open('save/arena.save', 'w')
         char_dict = self.__dict__
         for key in char_dict.keys():
             save_file.write("%s=%s\n" % (key, char_dict[key]))
