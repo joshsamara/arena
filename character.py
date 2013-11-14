@@ -374,7 +374,7 @@ class Character(object):
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
 
-    def library(character):
+    def library(self):
         clear()
         print "Welcome to the:"
         print """
