@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from character import *
+from resources.character import *
 
 
 # TODO LIST:
@@ -22,7 +22,7 @@ def load():
     global NEW_GAME
     loaded = False
     try:
-        save_file = open('arena.save', 'r')
+        save_file = open('save/arena.save', 'r')
         save_text = save_file.read()
         split_file = save_text.split("\n")
         loaded_char = Character()
