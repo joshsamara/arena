@@ -76,9 +76,6 @@ def load():
         return MY_CHAR
     else:
         return Character()
-
-
-
 #
 # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 #
@@ -89,8 +86,9 @@ def load():
 # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
 #
 
-clear()
-intro = """___________________________________________________
+if __name__ == "__main__":
+    clear()
+    intro = """___________________________________________________
 
    /$$$$$$
   /$$__  $$
@@ -108,37 +106,34 @@ intro = """___________________________________________________
                    By Josh Samara
 ___________________________________________________"""
 
-for line in intro.split("\n"):
-    print line
-    time.sleep(.01)
-
-
-cm()
-clear()
-
-
-character = load()
-if NEW_GAME:
-    name = raw_input("What is your name?\n")
-    character.name = name
-    clear()
-    print "Greetings, %s" % character.name
-    print "You are a mighty gladiator of the Emporer's Arena"
-    print "You are just starting out your gladiator career"
-    print "However the hard truth is that you are forced to fight"
-    print "Every day you must fight or the emperorer's legion will imprison you"
-    print "You are allowed to wander town and train your skills in between fights"
-    print "The emperorer will become bored with you in 100 days and have you killed"
-    print "Can you become the ultimate warrior?"
-    print "Will you get strong enough to fight your way to freedom?"
+    for line in intro.split("\n"):
+        print line
+        time.sleep(.01)
     cm()
-    print ".\n.\n.\n.\n."
-    print "For today, you have finished your battle and are ready to relax."
-    print "Feel free to train in the fields, visit the smith and more"
-    print "The tavern has given you a permanent room. You can rest there"
-    cm("Press any key to proceed to Town.....")
-    character.town()
-else:
-    print "Welcome back, %s" % character.name
-    cm("Press any key to proceed to Town.....")
-    character.town(False)
+    clear()
+    character = load()
+    if NEW_GAME:
+        name = raw_input("What is your name?\n")
+        character.name = name
+        clear()
+        print """Greetings, %s.
+Here you start your trials in the arena.
+Travel the town to train your skills and combat abilities.
+Enter the arena to fight and gain experience.
+""" % character.name
+        cm()
+        print """
+.
+.
+.
+
+You have a room in the tavern.
+You can spend the nights there.
+Your adventure starts here.
+"""
+        cm("Press any key to proceed to Town.....")
+        character.town()
+    else:
+        print "Welcome back, %s" % character.name
+        cm("Press any key to proceed to Town.....")
+        character.town(False)
