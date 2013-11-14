@@ -44,9 +44,12 @@ def cm(text=None):
     if text is None:
         print "Press any key to continue..."
     elif text is not None:
-        pretty_message = {"tavern": "Tavern", "library": "Library", "town": "Town", "fields": "Fields", "smith": "Blacksmith"}
+        pretty_message = {"tavern": "Tavern", "library":
+                          "Library", "town": "Town",
+                          "fields": "Fields",
+                          "smith": "Blacksmith"}
         try:
-            message =  pretty_message[text.lower()]
+            message = pretty_message[text.lower()]
             print "\nPress any key to retun to the %s..." % message
         except KeyError:
             print text
@@ -65,6 +68,7 @@ def print_bar(version):
     else:
         print "#################################"
 
+
 # just give a string of valid inputs
 # you could give an array or something if you wanted
 # idk why you would
@@ -81,7 +85,6 @@ def get_val(inputs):
         val = get_val(inputs)
     clear()
     return val
-
 
 
 def exit():

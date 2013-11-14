@@ -1,10 +1,13 @@
 #!/usr/bin/python
 class _GetchUnix:
     def __init__(self):
-        import tty, sys
+        import tty
+        import sys
 
     def __call__(self):
-        import sys, tty, termios
+        import sys
+        import tty
+        import termios
         fd = sys.stdin.fileno()
         old_settings = termios.tcgetattr(fd)
         try:
