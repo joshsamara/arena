@@ -38,22 +38,18 @@ ENEMY_TYPES = [["Peasant"],
 #
 # Text management
 #
+
+# 'Continue message'
 def cm(text=None):
     if text is None:
         print "Press any key to continue..."
     elif text is not None:
-        if text.lower() == "tavern":
-            print "\nPress any key to retun to the Tavern..."
-        elif text.lower() == "library":
-            print "\nPress any key to retun to the Library..."
-        elif text.lower() == "town":
-            print "\nPress any key to retun to Town..."
-        elif text.lower() == "fields":
-            print "\nPress any key to retun to the Fields.."
-        elif text.lower() == "smith":
-            print "\nPress any key to retun to the Blacksmith.."
-    else:
-        print text
+        pretty_message = {"tavern": "Tavern", "library": "Library", "town": "Town", "fields": "Fields", "smith": "Blacksmith"}
+        try:
+            message =  pretty_message[text.lower()]
+            print "\nPress any key to retun to the %s..." % message
+        except KeyError:
+            print text
     getch()
 
 

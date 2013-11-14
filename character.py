@@ -156,10 +156,9 @@ class Character(object):
                 self.print_stat(to_print)
         if self.not_dead():
             cm(destination)
-            self eval(destination)()  # TODO: FIX THIS. WHO DOES THIS.
+            eval("self."+destination+"()") # TODO: FIX THIS. WHO DOES THIS.
         else:
             print "ERROR IN EVENT RETURN: %s" % self
-
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@
     #
@@ -833,3 +832,4 @@ class Character(object):
             return int(damage - stats.defense)
         else:
             return int(damage)
+
