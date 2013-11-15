@@ -1,8 +1,8 @@
 import random
 import time
 import math
+import events
 from common import *
-from events import *
 
 
 class Character(object):
@@ -285,9 +285,9 @@ class Character(object):
         val = get_val("mdsgbt")
         clear()
         if val == "m":
-            self.run_event(eTavern.EAT)
+            self.run_event(events.tavern.EAT)
         elif val == "d":
-            self.run_event(eTavern.DRINK)
+            self.run_event(events.tavern.DRINK)
         elif val == "s":
             self.sleep()
         elif val == "g":
@@ -364,13 +364,13 @@ class Character(object):
         val = get_val("sbhrmt")
         clear()
         if val == "s":
-            self.run_event(eLibrary.STUDY)
+            self.run_event(events.library.STUDY)
         elif val == "b":
-            self.run_event(eLibrary.BOOK)
+            self.run_event(events.library.BOOK)
         elif val == "h":
-            self.run_event(eLibrary.TUTOR)
+            self.run_event(events.library.TUTOR)
         elif val == "r":
-            self.run_event(eLibrary.READ)
+            self.run_event(events.library.READ)
         elif val == "m":
             self.magics()
         elif val == "t":
@@ -421,13 +421,13 @@ class Character(object):
 
         clear()
         if val == "d":
-            self.run_event(eFields.DUMMY)
+            self.run_event(events.fields.DUMMY)
         elif val == "m":
-            self.run_event(eFields.MASTER)
+            self.run_event(events.fields.MASTER)
         elif val == "c":
-            self.run_event(eFields.COURSE)
+            self.run_event(events.fields.COURSE)
         elif val == "r":
-            self.run_event(eFields.RACE)
+            self.run_event(events.fields.RACE)
         elif val == "s":
             self.show()
         elif val == "t":
