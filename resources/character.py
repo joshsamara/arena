@@ -1,7 +1,8 @@
 import random
 import time
 import math
-from .common import *
+from common import *
+from events import *
 
 
 class Character(object):
@@ -141,25 +142,25 @@ class Character(object):
     # GENERIC EVENT TEMPLATE
     #
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    def event(self, gold_req, time_req, life_req, message,
-              stats, destination, printing=True):
-        if self.requires(gold_req, time_req, life_req):
-            print message
-            self.time_pass(time_req)
-            (None, self.spend_gold(gold_req))[gold_req > 0]
-            for field, change in stats:
+    def run_event(self, anEvent):
+        if self.requires(anEvent.gold_req, anEvent.time_req, anEvent.life_req):
+            anEvent.run_process(self)
+            print anEvent.message
+            self.time_pass(anEvent.time_req)
+            if anEvent.gold_req > 0 : self.spend_gold(anEvent.gold_req)
+            for field, change in anEvent.stats:
                 self.stat(field, change)
-            if printing:
-                possibs = [("gold", gold_req),
-                           ("hrs", time_req),
-                           ("hp", life_req)]
-                to_print = [s for s, val in possibs + stats if val > 0]
+            if anEvent.printing:
+                possibs = [("gold", anEvent.gold_req),
+                           ("hrs", anEvent.time_req),
+                           ("hp", anEvent.life_req)]
+                to_print = [s for s, val in possibs + anEvent.stats if val > 0]
                 # print to_print
                 self.print_stat(to_print)
         if self.not_dead():
-            cm(destination)
+            cm(anEvent.destination)
             # TODO: FIX THIS. WHO DOES THIS.
-            eval("self." + destination + "()")
+            eval("self." + anEvent.destination + "()")
         else:
             print "ERROR IN EVENT RETURN: %s" % self
 
@@ -175,7 +176,7 @@ class Character(object):
 
   ____
  / ___|  __ ___   _____
- \___ \ / _` \ \ / / _ \
+ \___ \ / _` \ \ / / _ \\
   ___) | (_| |\ V /  __/
  |____/ \__,_| \_/ \___|
 """
@@ -218,7 +219,7 @@ class Character(object):
         print """
   _____
  |_   _|____      ___ __
-   | |/ _ \ \ /\ / / '_ \
+   | |/ _ \ \ /\ / / '_ \\
    | | (_) \ V  V /| | | |
    |_|\___/ \_/\_/ |_| |_|
 """
@@ -268,7 +269,7 @@ class Character(object):
         print """
   _____
  |_   _|_ ___   _____ _ __ _ __
-   | |/ _` \ \ / / _ \ '__| '_ \
+   | |/ _` \ \ / / _ \ '__| '_ \\
    | | (_| |\ V /  __/ |  | | | |
    |_|\__,_| \_/ \___|_|  |_| |_|
 """
@@ -284,9 +285,9 @@ class Character(object):
         val = get_val("mdsgbt")
         clear()
         if val == "m":
-            self.eat()
+            self.run_event(eTavern.EAT)
         elif val == "d":
-            self.drink()
+            self.run_event(eTavern.DRINK)
         elif val == "s":
             self.sleep()
         elif val == "g":
@@ -299,23 +300,6 @@ class Character(object):
             print "ERROR IN TAVERN SELECT"
             cm()
 
-    def eat(self):
-        gold_req, time_req, life_req = 1, 1, 0
-        message = """You order a big steak and devour it
-It's relieving after a long day"""
-        heal = int(math.ceil(int(self.vit) / 2))
-        stats = [("hp", heal)]
-        destination = "tavern"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def drink(self):
-        gold_req, time_req, life_req = 1, 1, 1
-        message = """You have a drink at the bar
-You practice some dice and card games"""
-        hurt = -int(math.ceil(self.vit / 10))
-        stats = [("hp", hurt), ("luck", 1)]
-        destination = "tavern"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
 
     def sleep(self):
         if self.requires(0, 0, 0):
@@ -361,13 +345,13 @@ You practice some dice and card games"""
         clear()
         print "Welcome to the:"
         print """
-      _       _
-     | |   (_) |__  _ __ __ _ _ __ _   _
-     | |   | | '_ \| '__/ _` | '__| | | |
-     | |___| | |_) | | | (_| | |  | |_| |
-     |_____|_|_.__/|_|  \__,_|_|   \__, |
-                                    |___/
-    """
+  _       _
+ | |   (_) |__  _ __ __ _ _ __ _   _
+ | |   | | '_ \| '__/ _` | '__| | | |
+ | |___| | |_) | | | (_| | |  | |_| |
+ |_____|_|_.__/|_|  \__,_|_|   \__, |
+                                |___/
+"""
         self.print_useful(True)
         print "Here you can do any of the following:"
         print "Study Magics              (S)  --  1hr"
@@ -380,13 +364,13 @@ You practice some dice and card games"""
         val = get_val("sbhrmt")
         clear()
         if val == "s":
-            self.study()
+            self.run_event(eLibrary.STUDY)
         elif val == "b":
-            self.book()
+            self.run_event(eLibrary.BOOK)
         elif val == "h":
-            self.tutor()
+            self.run_event(eLibrary.TUTOR)
         elif val == "r":
-            self.read()
+            self.run_event(eLibrary.READ)
         elif val == "m":
             self.magics()
         elif val == "t":
@@ -395,37 +379,6 @@ You practice some dice and card games"""
             print "ERROR IN LIBRARY SELECT"
             cm()
 
-    def study(self):
-        gold_req, time_req, life_req = 0, 1, 0
-        message = """You spend some time studying battle techniques,
-and the arcane arts."""
-        stats = [("int", 1)]
-        destination = "library"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def book(self):
-        gold_req, time_req, life_req = 1, 3, 0
-        message = "You borrow and read a book of advanced\nfighting and magics"
-        stats = [("int", 4)]
-        destination = "library"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def tutor(self):
-        gold_req, time_req, life_req = 3, 3, 0
-        message = """You have an advanced wizard teach you
-some incredibly difficult magic"""
-        stats = [("int", 7)]
-        destination = "library"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def read(self):
-        gold_req, time_req, life_req = 0, 1, 0
-        message = "You read a nice fiction book and rest"
-        heal = int(math.ceil(int(self.vit) / 10))
-        stats = [("hp", heal)]
-        destination = "library"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
     def magics(self):
         if self.requires(0, 8):
             print "You work a day teaching magic to others"
@@ -433,7 +386,7 @@ some incredibly difficult magic"""
             self.time_pass(8)
             self.print_stat(["gold"])
         cm("library")
-        library(self)
+        self.library()
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -449,11 +402,11 @@ some incredibly difficult magic"""
         clear()
         print "Welcome to the:"
         print """
-      _____        _     _
-     |  ___(_) ___| | __| |___
-     | |_  | |/ _ \ |/ _` / __|
-     |  _| | |  __/ | (_| \__ \
-     |_|   |_|\___|_|\__,_|___/
+  _____        _     _
+ |  ___(_) ___| | __| |___
+ | |_  | |/ _ \ |/ _` / __|
+ |  _| | |  __/ | (_| \__ \\
+ |_|   |_|\___|_|\__,_|___/
 """
         self.print_useful()
         print "Here you can do any of the following:"
@@ -468,13 +421,13 @@ some incredibly difficult magic"""
 
         clear()
         if val == "d":
-            self.dummy()
+            self.run_event(eFields.DUMMY)
         elif val == "m":
-            self.master()
+            self.run_event(eFields.MASTER)
         elif val == "c":
-            self.course()
+            self.run_event(eFields.COURSE)
         elif val == "r":
-            self.race()
+            self.run_event(eFields.RACE)
         elif val == "s":
             self.show()
         elif val == "t":
@@ -483,36 +436,6 @@ some incredibly difficult magic"""
             print "ERROR IN FIELDS SELECT"
             cm()
 
-    def dummy(self):
-        gold_req, time_req, life_req = 0, 2, 0
-        message = "You beat up a dummy for a nice work out."
-        stats = [("str", 1)]
-        destination = "fields"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def master(self):
-        gold_req, time_req, life_req = 1, 3, 1
-        message = """You spar a master trainer for some time.
-He shows you a thing or two about fighting.
-You take a few hits though."""
-        stats = [("str", 6)]
-        destination = "fields"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def course(self):
-        gold_req, time_req, life_req = 0, 2, 0
-        message = "You dash through obstacle course for a few hours"
-        stats = [("agil", 1)]
-        destination = "fields"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
-    def race(self):
-        gold_req, time_req, life_req = 3, 1, 0
-        message = "You run a race and it really works your muscles."
-        stats = [("agil", 3)]
-        destination = "fields"
-        self.event(gold_req, time_req, life_req, message, stats, destination)
-
     def show(self):
         if self.requires(0, 8):
             print "You spend a day performing tricks"
@@ -520,7 +443,7 @@ You take a few hits though."""
             self.time_pass(8)
             self.print_stat(["gold"])
         cm("fields")
-        fields(self)
+        self.fields()
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -533,12 +456,12 @@ You take a few hits though."""
         clear()
         print "Welcome to the:"
         print """
-      ____            _ _   _
-     / ___| _ __ ___ (_) |_| |__
-     \___ \| '_ ` _ \| | __| '_ \
-      ___) | | | | | | | |_| | | |
-     |____/|_|_|_| |_|_|\__|_| |_|
-     """
+  ____            _ _   _
+ / ___| _ __ ___ (_) |_| |__
+ \___ \| '_ ` _ \| | __| '_ \\
+  ___) | | | | | | | |_| | | |
+ |____/|_|_|_| |_|_|\__|_| |_|
+ """
         self.print_useful()
         print "Here you can do any of the following:"
         print "Upgrade your Weapon       (W)  ?g  ---"
@@ -580,7 +503,7 @@ You take a few hits though."""
         elif val == "n":
             print "You decide to save upgrading for later"
         cm("smith")
-        smith(self)
+        self.smith()
 
     def armup(self):
         clear()
@@ -602,7 +525,7 @@ You take a few hits though."""
         elif val == "n":
             print "You decide to save upgrading for later"
         cm("smith")
-        smith(self)
+        self.smith()
 
     def forge(self):
         if self.requires(0, 8):
@@ -611,7 +534,7 @@ You take a few hits though."""
             self.time_pass(8)
             self.print_stat(["gold"])
         cm("smith")
-        smith(self)
+        self.smith()
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -631,12 +554,12 @@ You take a few hits though."""
         clear()
         print "Welcome to the:"
         print """
-         _
-        / \\   _ __ ___ _ __   __ _
-       / _ \\ | '__/ _ \\ '_ \\ / _` |
-      / ___ \\| | |  __/ | | | (_| |
-     /_/   \\_\\_|  \\___|_| |_|\\__,_|
-     """
+     _
+    / \\   _ __ ___ _ __   __ _
+   / _ \\ | '__/ _ \\ '_ \\ / _` |
+  / ___ \\| | |  __/ | | | (_| |
+ /_/   \\_\\_|  \\___|_| |_|\\__,_|
+ """
         self.print_useful()
         print "Here you must either fight or return to town"
         print "Fight!                    (F)  --  1hr"

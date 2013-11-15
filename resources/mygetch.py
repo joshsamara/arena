@@ -1,4 +1,3 @@
-#!/usr/bin/python
 class _GetchUnix:
     def __init__(self):
         import tty
