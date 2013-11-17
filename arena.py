@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from .resources.character import *
+from resources.character import *
 
 
 # TODO LIST:
@@ -102,7 +102,7 @@ if __name__ == "__main__":
 
 
                  A Gladiator's Tale
--===========]=        Beta 0.7       =[===========-
+-===========]=        Beta 0.75      =[===========-
                    By Josh Samara
 ___________________________________________________"""
 

@@ -465,16 +465,19 @@ class Character(object):
         print "Here you can do any of the following:"
         print "Upgrade your Weapon       (W)  ?g  ---"
         print "Upgrade your Armor        (A)  ?g  ---"
+        print "Mine ores                 (M)  --  4hr"
         print "Work the Forge            (F)  --  8hr"
         print "Return to Town            (T)  --  ---"
 
-        val = get_val("waft")
+        val = get_val("wamft")
 
         clear()
         if val == "w":
             self.wepup()
         elif val == "a":
             self.armup()
+        elif val == "m":
+            self.run_event(events.smith.MINE)
         elif val == "f":
             self.forge()
         elif val == "t":
