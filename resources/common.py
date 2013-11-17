@@ -18,21 +18,6 @@ PRETTY_STAT = {
     "luck": "Luck",
     "day": "Day",
     "hrs": "Hours"}
-ENEMY_TYPES = [["Peasant"],
-               ["Fighter",
-                "Thief",
-                "Apprentice"],
-               ["Warrior",
-                "Ranger",
-                "Mage"],
-               ["Paladin",
-                "Assassin",
-                "Wizard]"],
-               ["Minotaur",
-                "Ninja",
-                "Archon"],
-               ["Shadow"]]
-
 
 #
 # Text management

@@ -1,9 +1,8 @@
-import random
 import time
 import math
 import events
 from common import *
-
+from fight import *
 
 class Character(object):
 
@@ -84,7 +83,7 @@ class Character(object):
             print "You wake up sometime in town"
             print "It looks like some of your gold is missing"
             cm("town")
-            town(self)
+            self.town()
 
     def requires(self, gold=1, hours=1, life=1):
         goldcheck = self.gold < gold
@@ -205,6 +204,7 @@ class Character(object):
         if "r" == val:
             self.town(False)
 
+    #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
     # Town
@@ -391,9 +391,7 @@ class Character(object):
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
-
     # Training Fields
-
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
@@ -539,13 +537,11 @@ class Character(object):
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
-
     #     _
     #    / \   _ __ ___ _ __   __ _
     #   / _ \ | '__/ _ \ '_ \ / _` |
     #  / ___ \| | |  __/ | | | (_| |
-    # /_/   \_\_|  \___|_| |_|\__, _|
-
+    # /_/   \_\_|  \___|_| |_|\__,_|
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
@@ -579,73 +575,19 @@ class Character(object):
     def fight(self):
         if self.requires(0, 1):
             self.time_pass(1)
-            enemy = make_enemy(pick_diff(self))
-            battle(self, enemy)
+            enemy = Enemy(pick_diff(self.lvl))
+            self.battle(enemy)
         cm()
         self.town(False)
 
-    def enemy_range(diff, lvl):
-        if diff == 1:
-            if lvl < 90:
-                return 90 - lvl
-            else:
-                return 0
-        elif diff == 3:
-            return lvl / 5 * 2
-        elif diff == 4:
-            if lvl > 25:
-                return math.floor(lvl / 5) * 2 - 10
-            else:
-                return 0
-        elif diff == 5:
-            if lvl > 40:
-                return lvl / 5 * 2 - 20
-            else:
-                return 0
-        elif diff == 6:
-            if lvl > 75:
-                return lvl / 5 * 2 - 30
-            else:
-                return 0
-
-    def pick_diff(self):
-        range1 = enemy_range(1, self.lvl)
-        range3 = range1 + enemy_range(3, self.lvl)
-        range4 = range3 + enemy_range(4, self.lvl)
-        range5 = range4 + enemy_range(5, self.lvl)
-        range6 = range5 + enemy_range(6, self.lvl)
-        pick = random.randint(1, 100)
-        if pick < range1:
-            difficulty = 1  # 1/10
-        elif pick < range3:
-            difficulty = 3  # 3/10
-        elif pick < range4:
-            difficulty = 4  # 4/10
-        elif pick < range5:
-            difficulty = 5  # 5/10
-        elif pick < range6:
-            difficulty = 6  # 10/10
-        else:
-            difficulty = 2  # 2/10
-        return difficulty
-
-    def make_enemy(diff):
-        global ENEMY_TYPES
-        return (
-            {'type': random.choice(
-                ENEMY_TYPES[diff - 1]),
-                'level': diff,
-                'hp': diff * 1000}
-        )
-
     def battle(self, enemy, message="\n>" * 4):
-        battle_display(self, enemy, message)
+        self.battle_display(enemy, message)
         val = get_val("ar")
         clear()
         if val == "a":
-            enemy, message = attack(self, enemy)
+            enemy, message = self.attack(enemy)
             if self.not_dead():
-                battle(self, enemy, message)
+                self.battle(enemy, message)
             else:
                 print "Error in battle"
         elif val == "r":
@@ -655,22 +597,20 @@ class Character(object):
 
     def battle_display(self, enemy, message):
         print "-" * 40
-        print "Enemy: %s" % enemy['type']
-        print "Level: %s" % enemy['level']
+        print "Enemy: %s" % enemy.type
+        print "Level: %s" % enemy.lvl
         equals = min(
-            int(math.ceil(enemy["hp"] / (enemy['level'] * 1000.0) * 25.0)),
+            int(math.ceil(enemy.hp / (enemy.lvl * 1000.0) * 25.0)),
             25)
         healthbar = "[" + "=" * equals + " " * (25 - equals) + "]"
         print "HP: %s" % healthbar
         print "-" * 40
-
         print message
         print_bar(2)
         print "Options:"
         print "Attack!                   (A)"
         print "Run!                      (R)"
         print_bar(2)
-
         print "\n"
         print "-" * 40
         your_equals = min(
@@ -683,37 +623,29 @@ class Character(object):
         print "-" * 40
 
     def attack(self, enemy):
-        my_damage = damage_calc(self, char=True)
-        enemy_damage = damage_calc(enemy, char=False)
-        damage_to_me = damage_reduce(self, enemy_damage, char=True)
-        damage_to_enemy = damage_reduce(enemy, my_damage, char=False)
+        my_damage = self.damage_calc()
+        enemy_damage = enemy.damage_calc()
+        damage_to_me = enemy_damage
+        damage_to_enemy = self.damage_reduce(my_damage)
         self.hp -= damage_to_me
         self.hp = max(self.hp, 0)  # SAFEGAURD AGAINST NEGATIVE HP
-        enemy["hp"] -= damage_to_enemy
-        enemy["hp"] = max(enemy["hp"], 0)
+        enemy.hp -= damage_to_enemy
+        enemy.hp = max(enemy.hp, 0)
         message = """
-    >
-    > You deal:    %s damage
-    > Enemy deals: %s damage
-    > """ % (damage_to_enemy, damage_to_me)
+>
+> You deal:    %s damage
+> Enemy deals: %s damage
+> """ % (damage_to_enemy, damage_to_me)
         return enemy, message
 
-    def damage_calc(stats, char=True):
-        if char:
-            # TODO: balance, crits?
-            base = int(stats.wep * (5 + stats.str + stats.int))
-            rand = random.randrange(
-                int(stats.agil),
-                1 + int(stats.luck + stats.agil))
-            return random.randrange(base, base + rand)
-        else:
-            base = stats["level"] * 5
-            rand = stats["level"] * 2
-            return random.randrange(base, base + rand)
+    def damage_calc(stats):
+        # TODO: balance, crits?
+        base = int(stats.wep * (5 + stats.str + stats.int))
+        rand = random.randrange(
+            int(stats.agil),
+            1 + int(stats.luck + stats.agil))
+        return random.randrange(base, base + rand)
 
     def damage_reduce(stats, damage, char=True):
         # TODO: agi = Dodge?
-        if char:
-            return int(damage - stats.defense)
-        else:
-            return int(damage)
+        return int(damage - stats.defense)
