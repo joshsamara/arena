@@ -24,6 +24,8 @@ PRETTY_STAT = {
 #
 
 # 'Continue message'
+
+
 def cm(text=None):
     if text is None:
         print "Press any key to continue..."

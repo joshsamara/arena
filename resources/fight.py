@@ -14,7 +14,8 @@ ENEMY_TYPES = [["Peasant"],
                 "Ninja",
                 "Archon"],
                ["Shadow"]]
-        
+
+
 def pick_diff(lvl):
     range1 = enemy_range(1, lvl)
     range3 = range1 + enemy_range(3, lvl)
@@ -35,6 +36,7 @@ def pick_diff(lvl):
     else:
         difficulty = 2  # 2/10
     return difficulty
+
 
 def enemy_range(diff, lvl):
     if diff == 1:
@@ -60,6 +62,7 @@ def enemy_range(diff, lvl):
         else:
             return 0
 
+
 class Enemy(object):
 
     """docstring for Enemy"""
@@ -78,4 +81,3 @@ class Enemy(object):
     def damage_reduce(self, damage):
         # TODO: agi = Dodge?
         return int(damage)
-

@@ -1,4 +1,5 @@
 class _GetchUnix:
+
     def __init__(self):
         import tty
         import sys

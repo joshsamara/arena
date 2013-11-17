@@ -1,5 +1,5 @@
 #!/usr/bin/python
-from resources.character import *
+from .resources.character import *
 
 
 # TODO LIST:

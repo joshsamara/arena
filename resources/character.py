@@ -4,6 +4,7 @@ import events
 from common import *
 from fight import *
 
+
 class Character(object):
 
     """Stats and functions for a players Character"""
@@ -146,7 +147,8 @@ class Character(object):
             anEvent.run_process(self)
             print anEvent.message
             self.time_pass(anEvent.time_req)
-            if anEvent.gold_req > 0 : self.spend_gold(anEvent.gold_req)
+            if anEvent.gold_req > 0:
+                self.spend_gold(anEvent.gold_req)
             for field, change in anEvent.stats:
                 self.stat(field, change)
             if anEvent.printing:
@@ -299,7 +301,6 @@ class Character(object):
         else:
             print "ERROR IN TAVERN SELECT"
             cm()
-
 
     def sleep(self):
         if self.requires(0, 0, 0):
