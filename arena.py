@@ -3,11 +3,8 @@ from resources.character import *
 
 # TODO LIST:
 # Generic work function
-# Vitality training (smith?)
 # Leveling up/xp system + rewards
 # Color printing?
-# Decide: All functions in character class vs wrapper class vs ???
-# ^ Split into multiple files? based on this -> better organization
 # Balance
 # End Game
 # More comments!
