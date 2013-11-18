@@ -106,6 +106,17 @@ class Character(object):
         else:
             return True
 
+    def check_lvlup(self):
+        # A1*A1 +10*A1 + 25
+        i = self.lvl + 1
+        needed =  i * i + 10 * i + 25 + (self.lvl * self.lvl + 10 * self.lvl + 25)
+        # print needed   print some sort of bar here 
+        if self.xp >= needed:
+            self.lvl = i
+            print "Your level has increased to %d!" % i
+        else:
+            pass
+
     def work(self, base, scale_stat, factor):
         added = int(math.floor(self.__dict__[scale_stat] / factor))
         earned = base + added
@@ -586,7 +597,8 @@ class Character(object):
 
     def victory(self, enemy):
         print "You win!"
-        self.stat("xp", enemy.lvl * 5)
+        self.stat("xp", enemy.calc_exp())
+        self.check_lvlup()
         cm("town")
         self.town(False)
 

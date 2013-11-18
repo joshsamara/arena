@@ -1,4 +1,5 @@
 import random
+import math
 
 ENEMY_TYPES = [["Peasant"],
                ["Fighter",
@@ -14,7 +15,6 @@ ENEMY_TYPES = [["Peasant"],
                 "Ninja",
                 "Archon"],
                ["Shadow"]]
-
 
 def pick_diff(lvl):
     range1 = enemy_range(1, lvl)
@@ -84,3 +84,9 @@ class Enemy(object):
 
     def not_dead(self):
         return self.hp > 0
+
+    def calc_exp(self):
+        # 2*I1^3 +3*I1^2 +I1 + 3
+        i = self.lvl
+        value = 2 * math.pow(i, 3) + 3 * math.pow(i, 2) + i + 3
+        return int(value)
