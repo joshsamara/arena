@@ -584,6 +584,12 @@ class Character(object):
         cm()
         self.town(False)
 
+    def victory(self, enemy):
+        print "You win!"
+        self.stat("xp", enemy.lvl * 5)
+        cm("town")
+        self.town(False)
+
     def battle(self, enemy, message="\n>" * 4):
         self.battle_display(enemy, message)
         val = get_val("ar")
@@ -591,7 +597,10 @@ class Character(object):
         if val == "a":
             enemy, message = self.attack(enemy)
             if self.not_dead():
-                self.battle(enemy, message)
+                if enemy.not_dead():
+                    self.battle(enemy, message)
+                else:
+                    self.victory(enemy)
             else:
                 print "Error in battle"
         elif val == "r":
@@ -604,7 +613,7 @@ class Character(object):
         print "Enemy: %s" % enemy.type
         print "Level: %s" % enemy.lvl
         equals = min(
-            int(math.ceil(enemy.hp / (enemy.lvl * 1000.0) * 25.0)),
+            int(math.ceil(enemy.hp / (enemy.lvl * 250.0) * 25.0)),
             25)
         healthbar = "[" + "=" * equals + " " * (25 - equals) + "]"
         print "HP: %s" % healthbar

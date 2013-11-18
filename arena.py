@@ -1,7 +1,6 @@
 #!/usr/bin/python
 from resources.character import *
 
-
 # TODO LIST:
 # Generic work function
 # Vitality training (smith?)

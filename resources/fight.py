@@ -71,7 +71,7 @@ class Enemy(object):
         super(Enemy, self).__init__()
         self.type = random.choice(ENEMY_TYPES[diff - 1])
         self.lvl = diff
-        self.hp = diff * 1000
+        self.hp = diff * 250
 
     def damage_calc(self):
         base = self.lvl * 5
@@ -81,3 +81,6 @@ class Enemy(object):
     def damage_reduce(self, damage):
         # TODO: agi = Dodge?
         return int(damage)
+
+    def not_dead(self):
+        return self.hp > 0
