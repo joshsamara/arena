@@ -227,10 +227,7 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
 
         print_bar(0)
         print "Name:  %s" % self.name
-        print "Level: %s" % self.lvl
-        print "Gold:  %s" % self.gold
-        print "Day:   %s" % self.day
-        print_bar(1)
+        self.print_useful(True)
         print "Would you like to save?"
         print "Press Q to exit, S to save, E to save and exit, or R to return"
         val = get_val("qsre")
