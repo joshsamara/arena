@@ -107,10 +107,17 @@ class Character(object):
         else:
             return True
 
+    def calc_needed_xp(self, lvl = None):
+        # return i * i + 10 * i + 25 + (self.lvl * self.lvl + 10 * self.lvl + 25)
+        # 2*lvl^2 + 22*lvl + 61 (simplified)
+        if lvl == None:
+            lvl = self.lvl
+        return 2 * math.pow(lvl, 2) + 22 * lvl + 61 
+
     def check_lvlup(self):
         # A1*A1 +10*A1 + 25
         i = self.lvl + 1
-        needed =  i * i + 10 * i + 25 + (self.lvl * self.lvl + 10 * self.lvl + 25)
+        needed =  self.calc_needed_xp()
         # print needed   print some sort of bar here 
         if self.xp >= needed:
             self.lvl = i
@@ -136,10 +143,25 @@ class Character(object):
         else:
             bar1 = 0
         print_bar(bar1)
-        print "Day:                      %s" % self.day
-        print "Time Remaining:           %s hrs" % self.hrs
-        print "Life Remaining:           %s hp" % self.hp
-        print "Gold Remaining:           %s gold" % self.gold
+
+#$: XXXXXX  TIME: XXX  LIFE: XXX/XXX
+#STR:  XXX  AGI:  XXX  INT:  XXX
+#LCK:  XXX  WEP:  XXX  DEF:  XXX
+#DAY:  XXX  EXP:  XXX  LVL:  XXX
+        to_print = """$: %6d  TIME: %3d  LIFE: %3d/%-3d
+STR:  %3d  AGI:  %3d  INT:  %3d
+LCK:  %3d  WEP:  %3d  DEF:  %3d
+DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
+        xp_perc = int(self.xp * 100 / (self.calc_needed_xp() - max(self.calc_needed_xp(self.lvl - 1),0)))
+        text_fill = (self.gold, self.hrs,  self.hp, self.vit,
+                     self.str,  self.agil, self.int,
+                     self.luck, self.wep,  self.defense,
+                     self.day,  xp_perc,   self.lvl)
+        print to_print % text_fill
+        # print "Day:                      %s" % self.day
+        # print "Time Remaining:           %s hrs" % self.hrs
+        # print "Life Remaining:           %s hp" % self.hp
+        # print "Gold Remaining:           %s gold" % self.gold
         print_bar(1)
 
     def print_stat(self, stats, showtime=True):

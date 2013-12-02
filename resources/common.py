@@ -67,7 +67,7 @@ def get_val(inputs):
         invalid = invalid and not char in val
 
     if invalid:
-        print ".",
+        # print ".",
         val = get_val(inputs)
     clear()
     return val
