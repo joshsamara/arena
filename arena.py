@@ -3,7 +3,7 @@ from resources.character import *
 
 # TODO LIST:
 # Generic work function
-# Leveling up/xp system + rewards
+# MAX Stats (999) stop increasing after?
 # Color printing?
 # Balance
 # End Game
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
 
                  A Gladiator's Tale
--===========]=        Beta 0.75      =[===========-
+-===========]=        Beta 0.90      =[===========-
                    By Josh Samara
 ___________________________________________________"""
 
