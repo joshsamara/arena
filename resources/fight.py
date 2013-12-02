@@ -90,3 +90,8 @@ class Enemy(object):
         i = self.lvl
         value = 2 * math.pow(i, 3) + 3 * math.pow(i, 2) + i + 3
         return int(value)
+
+    def calc_gold(self):
+        i = self.lvl
+        value = 10 * math.pow(i, 2) 
+        return int(value)

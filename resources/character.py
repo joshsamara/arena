@@ -48,6 +48,7 @@ class Character(object):
         global PRETTY_STAT
         pass_print = False
         if changed_stat == "hp" and self.hp >= self.vit and change > 0:
+            self.hp = self.vit
             print "Already at max HP"
             pass_print = True
         else:
@@ -114,6 +115,9 @@ class Character(object):
         if self.xp >= needed:
             self.lvl = i
             print "Your level has increased to %d!" % i
+            for aStat in ["str", "int", "agil", "luck", "vit"]:
+                self.stat(aStat, random.randint(3,10))
+                #add a little randomness to leveling for kicks
         else:
             pass
 
@@ -161,7 +165,7 @@ class Character(object):
             if anEvent.gold_req > 0:
                 self.spend_gold(anEvent.gold_req)
             for field, change in anEvent.stats:
-                self.stat(field, change)
+                self.stat(field, random.randint(change, 2*change)) #MORE RANDOM!
             if anEvent.printing:
                 possibs = [("gold", anEvent.gold_req),
                            ("hrs", anEvent.time_req),
@@ -598,6 +602,7 @@ class Character(object):
     def victory(self, enemy):
         print "You win!"
         self.stat("xp", enemy.calc_exp())
+        self.stat("gold", enemy.calc_gold())
         self.check_lvlup()
         cm("town")
         self.town(False)
@@ -650,8 +655,8 @@ class Character(object):
     def attack(self, enemy):
         my_damage = self.damage_calc()
         enemy_damage = enemy.damage_calc()
-        damage_to_me = enemy_damage
-        damage_to_enemy = self.damage_reduce(my_damage)
+        damage_to_me = self.damage_reduce(enemy_damage)
+        damage_to_enemy = enemy.damage_reduce(my_damage)
         self.hp -= damage_to_me
         self.hp = max(self.hp, 0)  # SAFEGAURD AGAINST NEGATIVE HP
         enemy.hp -= damage_to_enemy
@@ -665,7 +670,7 @@ class Character(object):
 
     def damage_calc(stats):
         # TODO: balance, crits?
-        base = int(stats.wep * (5 + stats.str + stats.int))
+        base = int(stats.wep * (stats.str + stats.int))
         rand = random.randrange(
             int(stats.agil),
             1 + int(stats.luck + stats.agil))
