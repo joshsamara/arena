@@ -187,7 +187,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
             if anEvent.gold_req > 0:
                 self.spend_gold(anEvent.gold_req)
             for field, change in anEvent.stats:
-                self.stat(field, random.randint(change, 2*change)) #MORE RANDOM!
+                if field != "hp":
+                    minVal = math.fabs(change)
+                    toChange = random.randint(minVal, minVal * 2)
+                    if change < 0: toChange = -toChange
+                else:
+                    toChange = change
+                self.stat(field, toChange) #MORE RANDOM!
             if anEvent.printing:
                 possibs = [("gold", anEvent.gold_req),
                            ("hrs", anEvent.time_req),
