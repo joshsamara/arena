@@ -47,7 +47,7 @@ class Character(object):
     def stat(self, changed_stat, change=1):
         global PRETTY_STAT
         pass_print = False
-        if changed_stat == "hp" and self.hp >= self.vit and change > 0:
+        if changed_stat == "hp" and self.hp + change >= self.vit:
             self.hp = self.vit
             print "Already at max HP"
             pass_print = True
@@ -60,7 +60,7 @@ class Character(object):
                 change_val = change
 
             if changed_stat == "hp" and change < 0:
-                self.hp = max(self.hp + change, self.vit)
+                self.hp = max(self.hp + change, 0)
             else:
                 self.__dict__[changed_stat] += change
 
@@ -79,8 +79,8 @@ class Character(object):
         else:
             self.stat("day")
             self.hp = int(self.vit / 10)
-            self.gold = random.randrange(int(self.gold / 2), self.gold)
-            self.hrs = random.randrange(1, 10)
+            self.gold = random.randint(int(self.gold / 2), self.gold)
+            self.hrs = random.randint(1, 10)
             print "You have passed out!"
             print "You wake up sometime in town"
             print "It looks like some of your gold is missing"
@@ -112,7 +112,11 @@ class Character(object):
         # 2*lvl^2 + 22*lvl + 61 (simplified)
         if lvl == None:
             lvl = self.lvl
-        return 2 * math.pow(lvl, 2) + 22 * lvl + 61 
+
+        if lvl < 0:
+            return 0
+        else:
+            return 2 * math.pow(lvl, 2) + 22 * lvl + 61 
 
     def check_lvlup(self):
         # A1*A1 +10*A1 + 25
@@ -127,6 +131,11 @@ class Character(object):
                 #add a little randomness to leveling for kicks
         else:
             pass
+
+    def xp_perc(self):
+        this_lvl = self.xp - self.calc_needed_xp(self.lvl - 1)
+        next_lvl = self.calc_needed_xp() - self.calc_needed_xp(self.lvl - 1)
+        return int(100 * this_lvl/next_lvl)
 
     def work(self, base, scale_stat, factor):
         added = int(math.floor(self.__dict__[scale_stat] / factor))
@@ -152,11 +161,10 @@ class Character(object):
 STR:  %3d  AGI:  %3d  INT:  %3d
 LCK:  %3d  WEP:  %3d  DEF:  %3d
 DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
-        xp_perc = int(self.xp * 100 / (self.calc_needed_xp() - max(self.calc_needed_xp(self.lvl - 1),0)))
         text_fill = (self.gold, self.hrs,  self.hp, self.vit,
                      self.str,  self.agil, self.int,
                      self.luck, self.wep,  self.defense,
-                     self.day,  xp_perc,   self.lvl)
+                     self.day,  self.xp_perc(),   self.lvl)
         print to_print % text_fill
         # print "Day:                      %s" % self.day
         # print "Time Remaining:           %s hrs" % self.hrs
@@ -696,10 +704,10 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
     def damage_calc(stats):
         # TODO: balance, crits?
         base = int(stats.wep * (stats.str + stats.int))
-        rand = random.randrange(
+        rand = random.randint(
             int(stats.agil),
             1 + int(stats.luck + stats.agil))
-        return random.randrange(base, base + rand)
+        return random.randint(base, base + rand)
 
     def damage_reduce(stats, damage, char=True):
         # TODO: agi = Dodge?
