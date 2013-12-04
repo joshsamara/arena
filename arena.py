@@ -45,7 +45,7 @@ def load():
             NEW_GAME = True
             cm()
 
-    except NameError as ErrorMessage:
+    except IOError as ErrorMessage:
         # print ErrorMessage
         print "No save file found"
         NEW_GAME = True
