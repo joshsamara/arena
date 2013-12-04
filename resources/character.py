@@ -31,7 +31,7 @@ class Character(object):
         save_file = open('save/arena.save', 'w')
         pickle.dump(self, save_file)
         save_file.close()
-        
+
     #
     # STAT MANAGEMENT
     #
@@ -537,6 +537,7 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         print_bar(0)
         print "Current weapon level:   %s" % self.wep
         print "Current upgrade cost:   %s gold" % cost
+        print "Current gold        :   %s gold" % self.gold
         print_bar(1)
         print "Would you like to upgrade your weapon? (y/n)"
 
@@ -558,6 +559,7 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         print_bar(0)
         print "Current armor level:    %s" % self.defense
         print "Current upgrade cost:   %s gold" % cost
+        print "Current gold        :   %s gold" % self.gold
         print_bar(1)
         print "Would you like to upgrade your armor? (y/n)"
 
