@@ -1,6 +1,7 @@
 import time
 import math
 import events
+import pickle
 from common import *
 from fight import *
 
@@ -28,13 +29,9 @@ class Character(object):
 
     def save(self):
         save_file = open('save/arena.save', 'w')
-        char_dict = self.__dict__
-        for key in char_dict.keys():
-            save_file.write("%s=%s\n" % (key, char_dict[key]))
-        print("Saved!")
-        cm()
+        pickle.dump(self, save_file)
         save_file.close()
-
+        
     #
     # STAT MANAGEMENT
     #

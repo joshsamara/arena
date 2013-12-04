@@ -19,26 +19,9 @@ def load():
     loaded = False
     try:
         save_file = open('save/arena.save', 'r')
-        save_text = save_file.read()
-        split_file = save_text.split("\n")
-        loaded_char = Character()
-        valid = True
-        if len(split_file) - 1 == len(loaded_char.__dict__):
-            for line in split_file:
-                if "=" in line:
-                    field, value = line.split("=")
-                    if field in Character().__dict__.keys():
-                        if field != "name":
-                            value = int(value)
-                        loaded_char.__dict__[field] = value
-                    else:
-                        print "Invalid field in save file %s" % field
-                        # print Character().__dict__.keys()
-                        valid = False
-        else:
-            valid = False
-
+        loaded_char = pickle.load(save_file)
         save_file.close()
+        valid = loaded_char.__dict__.keys() == Character().__dict__.keys()
 
         if valid:
         # print len(save_text)
@@ -63,7 +46,7 @@ def load():
             cm()
 
     except NameError as ErrorMessage:
-        print ErrorMessage
+        # print ErrorMessage
         print "No save file found"
         NEW_GAME = True
         cm()
