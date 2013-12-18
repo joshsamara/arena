@@ -46,13 +46,15 @@ class Character(object):
         pass_print = False
         if changed_stat == "hp" and self.hp + change >= self.vit:
             self.hp = self.vit
-            print "Already at max HP"
+            print color("Already at max HP", "blue")
             pass_print = True
         else:
             if change < 0:
+                to_color = "red"
                 change_text = "decreased"
                 change_val = change * -1
             else:
+                to_color = "green"
                 change_text = "increased"
                 change_val = change
 
@@ -65,10 +67,10 @@ class Character(object):
             pass_print = True
 
         if not pass_print and changed_stat != "hrs":
-            print "%s %s by %s!" % (PRETTY_STAT[changed_stat],
+            print color("%s %s by %s!",to_color) % (PRETTY_STAT[changed_stat],
                                     change_text, change_val)
         elif changed_stat == "hrs":
-            print "%s hour(s) passed!" % change
+            print color("%s hour(s) passed!", "red") % change
 
     def not_dead(self):
         if self.hp > 0:
@@ -78,7 +80,7 @@ class Character(object):
             self.hp = int(self.vit / 10)
             self.gold = random.randint(int(self.gold / 2), self.gold)
             self.hrs = random.randint(1, 10)
-            print "You have passed out!"
+            print color("You have passed out!", "red")
             print "You wake up sometime in town"
             print "It looks like some of your gold is missing"
             cm("town")
@@ -92,13 +94,13 @@ class Character(object):
         if goldcheck or hourcheck or lifecheck:
             print "Impossible!"
             if goldcheck:
-                print "You need %s gold" % gold
+                print color("You need %s gold","red") % gold
                 print "You have %s gold" % self.gold
             if hourcheck:
-                print "You neeed %s hours" % hours
+                print color("You neeed %s hours","red") % hours
                 print "There are %s hours left" % self.hrs
             if lifecheck:
-                print "You need %s life" % life
+                print color("You need %s life", "red") % life
                 print "You have %s life" % self.hp
             return False
         else:
@@ -122,7 +124,7 @@ class Character(object):
         # print needed   print some sort of bar here 
         if self.xp >= needed:
             self.lvl = i
-            print "Your level has increased to %d!" % i
+            print color("Your level has increased to %d!","green") % i
             for aStat in ["str", "int", "agil", "luck", "vit"]:
                 self.stat(aStat, random.randint(3,10))
                 #add a little randomness to leveling for kicks
@@ -154,11 +156,15 @@ class Character(object):
 #STR:  XXX  AGI:  XXX  INT:  XXX
 #LCK:  XXX  WEP:  XXX  DEF:  XXX
 #DAY:  XXX  EXP:  XXX  LVL:  XXX
-        to_print = """$: %6d  TIME: %3d  LIFE: %3d/%-3d
+        to_print = """$: %s  TIME: %s  LIFE: %s/%-3d
 STR:  %3d  AGI:  %3d  INT:  %3d
 LCK:  %3d  WEP:  %3d  DEF:  %3d
 DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
-        text_fill = (self.gold, self.hrs,  self.hp, self.vit,
+
+        money_print = color("%6d" % self.gold, "yellow")
+        time_print =  color("%3d" % self.hrs, "teal")
+        life_print =  color("%3d"  % self.hp, "pink")
+        text_fill = (money_print, time_print, life_print, self.vit,
                      self.str,  self.agil, self.int,
                      self.luck, self.wep,  self.defense,
                      self.day,  self.xp_perc(),   self.lvl)
@@ -221,14 +227,14 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
 
     def save_prompt(self):
         clear()
-        print """
+        print color("""
 
   ____
  / ___|  __ ___   _____
  \___ \ / _` \ \ / / _ \\
   ___) | (_| |\ V /  __/
  |____/ \__,_| \_/ \___|
-"""
+""", "pink")
 
         print_bar(0)
         print "Name:  %s" % self.name
@@ -313,13 +319,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
     def tavern(self):
         clear()
         print "Welcome to the:"
-        print """
+        print color("""
   _____
  |_   _|_ ___   _____ _ __ _ __
    | |/ _` \ \ / / _ \ '__| '_ \\
    | | (_| |\ V /  __/ |  | | | |
    |_|\__,_| \_/ \___|_|  |_| |_|
-"""
+""", "yellow")
         self.print_useful()
         print "Here you can do any of the following:"
         print "Buy a Meal                (M)  1g  1hr"
@@ -390,14 +396,14 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
     def library(self):
         clear()
         print "Welcome to the:"
-        print """
+        print color("""
   _       _
  | |   (_) |__  _ __ __ _ _ __ _   _
  | |   | | '_ \| '__/ _` | '__| | | |
  | |___| | |_) | | | (_| | |  | |_| |
  |_____|_|_.__/|_|  \__,_|_|   \__, |
                                 |___/
-"""
+""", "teal")
         self.print_useful(True)
         print "Here you can do any of the following:"
         print "Study Magics              (S)  --  1hr"
@@ -445,13 +451,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
     def fields(self):
         clear()
         print "Welcome to the:"
-        print """
+        print color("""
   _____        _     _
  |  ___(_) ___| | __| |___
  | |_  | |/ _ \ |/ _` / __|
  |  _| | |  __/ | (_| \__ \\
  |_|   |_|\___|_|\__,_|___/
-"""
+""", "green")
         self.print_useful()
         print "Here you can do any of the following:"
         print "Fight a training Dummy    (D)  --  2hr"
@@ -499,13 +505,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
     def smith(self):
         clear()
         print "Welcome to the:"
-        print """
+        print color("""
   ____            _ _   _
  / ___| _ __ ___ (_) |_| |__
  \___ \| '_ ` _ \| | __| '_ \\
   ___) | | | | | | | |_| | | |
  |____/|_|_|_| |_|_|\__|_| |_|
- """
+ """, "blue")
         self.print_useful()
         print "Here you can do any of the following:"
         print "Upgrade your Weapon       (W)  ?g  ---"
@@ -600,13 +606,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
     def arena(self):
         clear()
         print "Welcome to the:"
-        print """
+        print color("""
      _
     / \\   _ __ ___ _ __   __ _
    / _ \\ | '__/ _ \\ '_ \\ / _` |
   / ___ \\| | |  __/ | | | (_| |
  /_/   \\_\\_|  \\___|_| |_|\\__,_|
- """
+ """, "red")
         self.print_useful()
         print "Here you must either fight or return to town"
         print "Fight!                    (F)  --  1hr"
@@ -661,11 +667,11 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         print "-" * 40
         print "Enemy: %s" % enemy.type
         print "Level: %s" % enemy.lvl
-        equals = min(
+        ticks = min(
             int(math.ceil(enemy.hp / (enemy.lvl * 250.0) * 25.0)),
             25)
-        healthbar = "[" + "=" * equals + " " * (25 - equals) + "]"
-        print "HP: %s" % healthbar
+        healthbar = color(" " * ticks, "redh") + " " * (25 - ticks)
+        print "HP: [%s]" % healthbar
         print "-" * 40
         print message
         print_bar(2)
@@ -675,13 +681,12 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         print_bar(2)
         print "\n"
         print "-" * 40
-        your_equals = min(
+        your_ticks = min(
             int(math.ceil(float(self.hp) / self.vit * 25.0)),
             25)
-        your_healthbar = "[" + "=" * your_equals + \
-            " " * (25 - your_equals) + "]"
+        your_healthbar = color(" " * your_ticks, "greenh") + " " * (25 - your_ticks)
         print "You:"
-        print "HP: %s %s/%s" % (your_healthbar, self.hp, self.vit)
+        print "HP: [%s] %s/%s" % (your_healthbar, self.hp, self.vit)
         print "-" * 40
 
     def attack(self, enemy):
@@ -693,11 +698,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         self.hp = max(self.hp, 0)  # SAFEGAURD AGAINST NEGATIVE HP
         enemy.hp -= damage_to_enemy
         enemy.hp = max(enemy.hp, 0)
+        you_deal = color("You deal:    %s damage", "green") % damage_to_enemy
+        enemy_deal = color("Enemy deals: %s damage", "red") % damage_to_me
         message = """
 >
-> You deal:    %s damage
-> Enemy deals: %s damage
-> """ % (damage_to_enemy, damage_to_me)
+> %s
+> %s
+> """ % (you_deal, enemy_deal)
         return enemy, message
 
     def damage_calc(stats):

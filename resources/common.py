@@ -116,6 +116,3 @@ def color(text, color):
         modifier = END
 
     return "%s%s%s" % (modifier, text, END)
-
-
-
