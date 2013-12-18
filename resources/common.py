@@ -116,3 +116,54 @@ def color(text, color):
         modifier = END
 
     return "%s%s%s" % (modifier, text, END)
+
+# print "Here you can do any of the following:"
+# print "Study Magics              (S)  --  1hr  ----"
+# print "Borrow a book             (B)  1g  3hr  ----"
+# print "Hire a tutor              (H)  3g  3hr  ----"
+# print "Read and relax            (R)  --  1hr  ----"
+# print "Tutor Magics              (M)  --  8hr  ----"
+# print "Return to Town            (T)  --  ---  ----"
+
+def make_option(description, hotkey, gold = 0, time = 0, hp = 0):
+    if gold == 0: 
+        gold = '--'
+    else:
+        gold = '%sg' % gold
+
+    if time == 0:
+        time = '---'
+    else:
+        time = '%shr' % time
+
+    if hp == 0:
+        hp = '---'
+    else:
+        hp = "%shp" % hp
+
+    hotkey = hotkey.upper()
+
+
+    return {'description':description, 'hotkey': hotkey, 'gold':gold, 'time':time, 'hp':hp}
+
+def nav_menu(option_list, short = False):
+    text = "Here you can do any of the following:\n"
+    line_start = "%-26s(%s)"
+    if short:
+        line_end = "\n"
+    else:
+        line_end = "  %s  %s  %s\n"
+
+    for option in option_list:
+        description = option['description']
+        hotkey = option['hotkey']
+        tmp_line_start = line_start % (description,hotkey)
+        tmp_line_start = tmp_line_start.replace(hotkey, color(hotkey, 'green'))
+        if short:
+            text += tmp_line_start + line_end
+        else:
+            gold = color(option['gold'], 'yellow')
+            time = color(option['time'], 'teal')
+            hp = color(option['hp'], 'pink')
+            text += tmp_line_start + line_end % (gold, time, hp)
+    return text.rstrip("\n")

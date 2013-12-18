@@ -239,8 +239,12 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         print_bar(0)
         print "Name:  %s" % self.name
         self.print_useful(True)
-        print "Would you like to save?"
-        print "Press Q to exit, S to save, E to save and exit, or R to return"
+        save_options = [make_option('Save', 'S'),
+                        make_option('Save and Exit', 'E'),
+                        make_option('Quit', 'Q'),
+                        make_option('Return', 'R')]
+
+        print nav_menu(save_options, short=True)
         val = get_val("qsre")
 
         if "s" == val:
@@ -268,8 +272,8 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
         clear()
         if refresh:
             self.hrs = 16
-        print "Welcome to:"
-        print """
+        print """Welcome to:
+
   _____
  |_   _|____      ___ __
    | |/ _ \ \ /\ / / '_ \\
@@ -278,14 +282,13 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
 """
 
         self.print_useful()
-        print "Here you can do any of the following:"
-        print "Enter the Tavern          (T)"
-        print "Go to the Library         (L)"
-        print "Go to the Trainng Fields  (F)"
-        print "Visit the Blacksmith      (B)"
-        print "Enter the Arena           (A)"
-        print "Save and/or exit the game (S)"
-
+        town_options = [make_option('Enter the Tavern', 'T'),
+                        make_option('Go to the Library', 'L'),
+                        make_option('Go to the Trainng Fields', 'F'),
+                        make_option('Visit the Blacksmith', 'B'),
+                        make_option('Enter the Arena', 'A'),
+                        make_option('Save and/or exit the game', 'S')]         
+        print nav_menu(town_options, short=True)
         val = get_val("stlfba9")
 
         if val == "s":
@@ -326,14 +329,16 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
    | | (_| |\ V /  __/ |  | | | |
    |_|\__,_| \_/ \___|_|  |_| |_|
 """, "yellow")
+
         self.print_useful()
-        print "Here you can do any of the following:"
-        print "Buy a Meal                (M)  1g  1hr"
-        print "Grab a Drink              (D)  1g  1hr"
-        print "Go to sleep               (S)  --  ---"
-        print "Gamble some gold          (G)  1g  1hr"
-        print "Bartend                   (B)  --  8hr"
-        print "Return to town            (T)  --  ---"
+
+        tavern_options = [make_option('Buy a Meal', 'M', gold=1, time=1),
+                          make_option('Grab a Drink', 'D', gold=1, time=1, hp=1),
+                          make_option('Go to Sleep', 'S'),
+                          make_option('Gamble some gold', 'G', gold=1, time=1),
+                          make_option('Bartend', 'B', time = 8),
+                          make_option('Return to Town', 'T')]
+        print nav_menu(tavern_options)
 
         val = get_val("mdsgbt")
         clear()
@@ -404,14 +409,17 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
  |_____|_|_.__/|_|  \__,_|_|   \__, |
                                 |___/
 """, "teal")
+
+
         self.print_useful(True)
-        print "Here you can do any of the following:"
-        print "Study Magics              (S)  --  1hr"
-        print "Borrow a book             (B)  1g  3hr"
-        print "Hire a tutor              (H)  3g  3hr"
-        print "Read and relax            (R)  --  1hr"
-        print "Tutor Magics              (M)  --  8hr"
-        print "Return to Town            (T)  --  ---"
+        library_options = [make_option('Study Magics', 'S', time=1),
+                           make_option('Borrow a book', 'B', gold=1, time=3),
+                           make_option('Hire a tutor', 'H', gold=3, time=3),
+                           make_option('Read and relax', 'R', time=1),
+                           make_option('Tutor Magics', 'M', time = 8),
+                           make_option('Return to Town', 'T')]
+        print nav_menu(library_options)
+
 
         val = get_val("sbhrmt")
         clear()
@@ -459,13 +467,14 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
  |_|   |_|\___|_|\__,_|___/
 """, "green")
         self.print_useful()
-        print "Here you can do any of the following:"
-        print "Fight a training Dummy    (D)  --  2hr"
-        print "Spar a Battle master      (M)  1g  3hr"
-        print "Run an obstacle Course    (C)  --  2hr"
-        print "Enter a Race              (R)  3g  1hr"
-        print "Perform Show tricks       (S)  --  8hr"
-        print "Return to Town            (T)  --  ---"
+
+        field_options = [make_option('Fight a training Dummy','D', time=2),
+                         make_option('Spar a Battle Master',  'M', gold=1, time=3, hp=1),
+                         make_option('Run an obstacle Course','C', time=2),
+                         make_option('Enter a Race',          'R', gold=3, time=1),
+                         make_option('Perform Show tricks',   'S', time = 8),
+                         make_option('Return to Town',        'T')]
+        print nav_menu(field_options)
 
         val = get_val("dmcrst")
 
@@ -513,13 +522,14 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
  |____/|_|_|_| |_|_|\__|_| |_|
  """, "blue")
         self.print_useful()
-        print "Here you can do any of the following:"
-        print "Upgrade your Weapon       (W)  ?g  ---"
-        print "Upgrade your Armor        (A)  ?g  ---"
-        print "Mine ores                 (M)  --  4hr"
-        print "Work the Forge            (F)  --  8hr"
-        print "Return to Town            (T)  --  ---"
 
+        smith_options = [make_option('Upgrade your Weapon', 'W', gold='?'),
+                         make_option('Upgrade your Armor ', 'A', gold='?'),
+                         make_option('Mine ores', 'M', time = 4),
+                         make_option('Work the Forge', 'F', time = 8),
+                         make_option('Return to Town', 'T')]
+
+        print nav_menu(smith_options)
         val = get_val("wamft")
 
         clear()
@@ -614,9 +624,10 @@ DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
  /_/   \\_\\_|  \\___|_| |_|\\__,_|
  """, "red")
         self.print_useful()
-        print "Here you must either fight or return to town"
-        print "Fight!                    (F)  --  1hr"
-        print "Return to Town            (T)  --  ---"
+        arena_options = [make_option('Fight!', 'F', time=1, hp='?'),
+                         make_option('Return to Town', 'T')]
+
+        print nav_menu(arena_options)
 
         val = get_val("ft")
 
