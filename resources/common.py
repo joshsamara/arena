@@ -76,3 +76,46 @@ def get_val(inputs):
 def exit():
     print "Goodbye"
     sys.exit()
+
+def color(text, color):
+    BASE    = '\033[%dm'
+    WHITE   = 0
+    #BASIC WHITE MANIP
+    WHITEB  = 1 #bold
+    WHITEU  = 4 #underline
+    WHITEF  = 5 #flashing
+    WHITEH  = 7 #highlighted
+    #BASIC COLORS
+    GREY    = 90
+    RED     = 91
+    GREEN   = 92
+    YELLOW  = 93
+    BLUE    = 94
+    PINK    = 95
+    TEAL    = 96
+    #HIGHLIGHTS
+    REDH    = 41
+    GREENH  = 42
+    YELLOWH = 43
+    BLUEH   = 44
+    PINKH   = 45
+    TEALH   = 46
+    WHITEH2 = 47
+    GREYH   = 100
+
+    #prooooobably not a good way to do things
+    choices = locals().copy()
+    for item in ['text', 'color', 'BASE']:
+        choices.pop(item)
+
+    END = BASE % WHITE
+    color = color.upper()
+    if color in choices.keys():
+        modifier = BASE % choices[color]
+    else:
+        modifier = END
+
+    return "%s%s%s" % (modifier, text, END)
+
+
+
