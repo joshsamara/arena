@@ -85,9 +85,7 @@ if __name__ == "__main__":
                    By Josh Samara
 ___________________________________________________"""
 
-    for line in intro.split("\n"):
-        print line
-        time.sleep(.01)
+    print intro
     cm()
     clear()
     character = load()

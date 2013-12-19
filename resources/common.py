@@ -47,12 +47,14 @@ def clear():
 
 
 def print_bar(version):
+    bar = "=" * 45
     if version == 0:
-        print "\n#################################"
+        bar = "\n" + bar
     elif version == 1:
-        print "#################################\n"
-    else:
-        print "#################################"
+        bar += "\n"
+    
+    print color(bar, 'grey')
+
 
 
 # just give a string of valid inputs

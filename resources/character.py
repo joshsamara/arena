@@ -156,10 +156,10 @@ class Character(object):
 #STR:  XXX  AGI:  XXX  INT:  XXX
 #LCK:  XXX  WEP:  XXX  DEF:  XXX
 #DAY:  XXX  EXP:  XXX  LVL:  XXX
-        to_print = """$: %s  TIME: %s  LIFE: %s/%-3d
-STR:  %3d  AGI:  %3d  INT:  %3d
-LCK:  %3d  WEP:  %3d  DEF:  %3d
-DAY:  %3d  EXP:  %2d%%  LVL:  %3d"""
+        to_print = """$:  %s    TIME: %2s/16   HP:  %2s/%-d
+STR:   %3d    AGI:  %3d     INT:  %3d
+LCK:   %3d    WEP:  %3d     DEF:  %3d
+DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
 
         money_print = color("%6d" % self.gold, "yellow")
         time_print =  color("%3d" % self.hrs, "teal")
