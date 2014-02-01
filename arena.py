@@ -47,7 +47,11 @@ def load():
 
     except IOError as ErrorMessage:
         # print ErrorMessage
-        print "No save file found"
+        print "No save file found!"
+        NEW_GAME = True
+        cm()
+    except EOFError as e:
+        print "Invalid save file found!"
         NEW_GAME = True
         cm()
     clear()
@@ -109,8 +113,13 @@ You can spend the nights there.
 Your adventure starts here.
 """
         cm("Press any key to proceed to Town.....")
-        character.town()
+        character.next = character.town
     else:
         print "Welcome back, %s" % character.name
         cm("Press any key to proceed to Town.....")
-        character.town(False)
+        character.next = character.town
+        character.args = [False]
+
+    while 1:
+        ## Run character next action
+        character.run()

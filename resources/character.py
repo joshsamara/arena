@@ -26,10 +26,42 @@ class Character(object):
         self.luck = 0
         self.day = 0
         self.hrs = 10
+        self.next = self.town
+        self.args = []
+
+    def run(self):
+        self.next(*self.args)
+
+    def move(self, place, printing = False):
+        self.args = []
+        if place == "town":
+            cm("moving to town")
+            self.next = self.town
+            self.args = [False]
+        elif place == "townR":
+            self.next = self.town
+        elif place == "tavern":
+            self.next = self.tavern
+        elif place == "library":
+            self.next = self.library
+        elif place == "fields":
+            self.next = self.fields
+        elif place == "smith":
+            self.next = self.smith
+        elif place == "arena":
+            self.next = self.arena
+        else:
+            raise Exception("Invalid move location: %s" % place)
+        if printing:
+            cm(place)
+        return
 
     def save(self):
         save_file = open('save/arena.save', 'w')
+        temp = self.next
+        self.next = None
         pickle.dump(self, save_file)
+        self.next = temp
         save_file.close()
 
     #
@@ -83,8 +115,8 @@ class Character(object):
             print color("You have passed out!", "red")
             print "You wake up sometime in town"
             print "It looks like some of your gold is missing"
-            cm("town")
-            self.town()
+            self.move("town")
+            return False
 
     def requires(self, gold=1, hours=1, life=1):
         goldcheck = self.gold < gold
@@ -213,11 +245,14 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
                 # print to_print
                 self.print_stat(to_print)
         if self.not_dead():
-            cm(anEvent.destination)
+            self.move(anEvent.destination)
+            # cm(anEvent.destination)
             # TODO: FIX THIS. WHO DOES THIS.
-            eval("self." + anEvent.destination + "()")
+            # eval("self." + anEvent.destination + "()")
         else:
-            print "ERROR IN EVENT RETURN: %s" % self
+            #handled in not_dead()
+            return
+            # print "ERROR IN EVENT RETURN: %s" % self
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@
     #
@@ -249,19 +284,20 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
 
         if "s" == val:
             self.save()
-            self.town(False)
+            self.move("town")
 
-        if "e" == val:
+        elif "e" == val:
             self.save()
             exit()
 
-        if "q" == val:
+        elif "q" == val:
             exit()
 
-        if "r" == val:
-            self.town(False)
+        elif "r" == val:
+            self.move("town")
+        return
 
-    #
+    #   
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
     # Town
@@ -294,24 +330,24 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         if val == "s":
             self.save_prompt()
         elif val == "t":
-            self.tavern()
+            self.move("tavern")
         elif val == "l":
-            self.library()
+            self.move("library")
         elif val == "f":
-            self.fields()
+            self.move("fields")
         elif val == "b":
-            self.smith()
+            self.move("smith")
         elif val == "a":
-            self.arena()
+            self.move("arena")
         elif val == "9":
             self.gold += 100
             self.hrs += 100
             self.hp += 100
+            self.move("town")
         else:
-            print "ERROR IN TOWN SELECT"
-            cm()
-        self.save_prompt()
-
+            self.save_prompt()
+            raise Exception("ERROR IN TOWN SELECT")
+        return
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
@@ -353,10 +389,11 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "b":
             self.bartend()
         elif val == "t":
-            self.town(False)
+            self.move("town")
         else:
-            print "ERROR IN TAVERN SELECT"
-            cm()
+            self.save_prompt()
+            raise Exception("ERROR IN TAVERN SELECT")
+        return
 
     def sleep(self):
         if self.requires(0, 0, 0):
@@ -364,8 +401,12 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             heal = int(math.ceil(int(self.vit) / 4))
             self.stat("hp", heal)
             self.stat("day")
-        cm("town")
-        self.town()
+        else:
+            self.save_prompt()
+            raise Exception("ERROR IN SLEEP")
+        self.move("townR")
+        return
+
 
     def gamble(self):
         if self.requires():
@@ -379,8 +420,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
                 self.spend_gold()
             self.time_pass(1)
             self.print_stat(["gold"])
-        cm("tavern")
-        self.tavern()
+        self.move("tavern")
+        return
 
     def bartend(self):
         if self.requires(0, 8):
@@ -388,8 +429,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             self.work(1, "luck", 3)
             self.time_pass(8)
             self.print_stat(["gold"])
-        cm("tavern")
-        self.tavern()
+        self.move("tavern")
+        return
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -434,10 +475,11 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "m":
             self.magics()
         elif val == "t":
-            self.town(False)
+            self.move("town")
         else:
-            print "ERROR IN LIBRARY SELECT"
-            cm()
+            self.save_prompt()
+            raise Exception("ERROR IN LIBRARY SELECT")
+        return
 
     def magics(self):
         if self.requires(0, 8):
@@ -445,8 +487,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             self.work(5, "int", 10)
             self.time_pass(8)
             self.print_stat(["gold"])
-        cm("library")
-        self.library()
+        self.move("library")
+        return
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -477,7 +519,6 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         print nav_menu(field_options)
 
         val = get_val("dmcrst")
-
         clear()
         if val == "d":
             self.run_event(events.fields.DUMMY)
@@ -490,10 +531,11 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "s":
             self.show()
         elif val == "t":
-            self.town(False)
+            self.move("town")
         else:
-            print "ERROR IN FIELDS SELECT"
-            cm()
+            self.save_prompt()
+            raise Exception("ERROR IN FIELDS SELECT")
+        return
 
     def show(self):
         if self.requires(0, 8):
@@ -501,8 +543,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             self.work(3, "agil", 7)
             self.time_pass(8)
             self.print_stat(["gold"])
-        cm("fields")
-        self.fields()
+        self.move("fields")
+        return
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -542,10 +584,11 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "f":
             self.forge()
         elif val == "t":
-            self.town(False)
+            self.move("town")
         else:
-            print "ERROR IN FIELDS SELECT"
-            cm()
+            self.save_prompt()
+            raise Exception("ERROR IN FIELDS SELECT")
+        return
 
     def wepup(self):
         clear()
@@ -566,8 +609,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
                 self.print_stat(["wep"])
         elif val == "n":
             print "You decide to save upgrading for later"
-        cm("smith")
-        self.smith()
+        self.move("smith")
+        return
 
     def armup(self):
         clear()
@@ -589,8 +632,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
                 self.print_stat(["defense"])
         elif val == "n":
             print "You decide to save upgrading for later"
-        cm("smith")
-        self.smith()
+        self.move("smith")
+        return
 
     def forge(self):
         if self.requires(0, 8):
@@ -598,9 +641,8 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             self.work(10, "str", 10)
             self.time_pass(8)
             self.print_stat(["gold"])
-        cm("smith")
-        self.smith()
-
+        self.move("smith")
+        return
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
@@ -635,26 +677,28 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         if val == "f":
             self.fight()
         elif val == "t":
-            self.town(False)
+            self.move("town")
         else:
+            self.save_prompt()
             print "ERROR IN ARENA SELECT"
-            cm()
+        return
+            
 
     def fight(self):
         if self.requires(0, 1):
             self.time_pass(1)
             enemy = Enemy(pick_diff(self.lvl))
             self.battle(enemy)
-        cm()
-        self.town(False)
+        self.move("town")
+        return
 
     def victory(self, enemy):
         print "You win!"
         self.stat("xp", enemy.calc_exp())
         self.stat("gold", enemy.calc_gold())
         self.check_lvlup()
-        cm("town")
-        self.town(False)
+        self.move("town")
+        return
 
     def battle(self, enemy, message="\n>" * 4):
         self.battle_display(enemy, message)
@@ -670,9 +714,11 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             else:
                 print "Error in battle"
         elif val == "r":
-            self.town(False)
+            self.move("town")
         else:
-            print "ERROR IN BATTLE SELECT"
+            self.save_prompt()
+            raise Exception ("ERROR IN BATTLE SELECT")
+        return
 
     def battle_display(self, enemy, message):
         print "-" * 40
@@ -699,6 +745,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         print "You:"
         print "HP: [%s] %s/%s" % (your_healthbar, self.hp, self.vit)
         print "-" * 40
+        return
 
     def attack(self, enemy):
         my_damage = self.damage_calc()
