@@ -32,10 +32,10 @@ class Character(object):
     def run(self):
         self.next(*self.args)
 
-    def move(self, place, printing = False):
+    def move(self, place, printing = True):
         self.args = []
         if place == "town":
-            cm("moving to town")
+            # cm("moving to town")
             self.next = self.town
             self.args = [False]
         elif place == "townR":
@@ -223,6 +223,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
     #
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     def run_event(self, anEvent):
+        print "RUNNING EVENT"
         if self.requires(anEvent.gold_req, anEvent.time_req, anEvent.life_req):
             anEvent.run_process(self)
             print anEvent.message
@@ -330,15 +331,15 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         if val == "s":
             self.save_prompt()
         elif val == "t":
-            self.move("tavern")
+            self.move("tavern", False)
         elif val == "l":
-            self.move("library")
+            self.move("library", False)
         elif val == "f":
-            self.move("fields")
+            self.move("fields", False)
         elif val == "b":
-            self.move("smith")
+            self.move("smith", False)
         elif val == "a":
-            self.move("arena")
+            self.move("arena", False)
         elif val == "9":
             self.gold += 100
             self.hrs += 100
@@ -389,7 +390,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "b":
             self.bartend()
         elif val == "t":
-            self.move("town")
+            self.move("town", False)
         else:
             self.save_prompt()
             raise Exception("ERROR IN TAVERN SELECT")
@@ -475,7 +476,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "m":
             self.magics()
         elif val == "t":
-            self.move("town")
+            self.move("town", False)
         else:
             self.save_prompt()
             raise Exception("ERROR IN LIBRARY SELECT")
@@ -531,7 +532,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "s":
             self.show()
         elif val == "t":
-            self.move("town")
+            self.move("town", False)
         else:
             self.save_prompt()
             raise Exception("ERROR IN FIELDS SELECT")
@@ -584,7 +585,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "f":
             self.forge()
         elif val == "t":
-            self.move("town")
+            self.move("town", False)
         else:
             self.save_prompt()
             raise Exception("ERROR IN FIELDS SELECT")
@@ -677,7 +678,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         if val == "f":
             self.fight()
         elif val == "t":
-            self.move("town")
+            self.move("town", False)
         else:
             self.save_prompt()
             print "ERROR IN ARENA SELECT"
