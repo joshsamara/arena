@@ -86,7 +86,7 @@ class Character(object):
         pass_print = False
         if changed_stat == "hp" and self.hp + change >= self.vit:
             self.hp = self.vit
-            print color("Already at max HP", "blue")
+            print color("Max HP!", "green")
             pass_print = True
         else:
             if change < 0:
@@ -176,11 +176,6 @@ class Character(object):
         next_lvl = self.calc_needed_xp() - self.calc_needed_xp(self.lvl - 1)
         return int(100 * this_lvl/next_lvl)
 
-    def work(self, base, scale_stat, factor):
-        added = int(math.floor(self.__dict__[scale_stat] / factor))
-        earned = base + added
-        self.spend_gold(-earned)
-
     #
     # STAT PRINTING
     #
@@ -232,37 +227,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     def run_event(self, anEvent):
         return anEvent.run_default(self)
-        # # print "RUNNING EVENT"
-        # if self.requires(anEvent.gold_req, anEvent.time_req, anEvent.life_req):
-        #     anEvent.run_process(self)
-        #     print anEvent.message
-        #     self.time_pass(anEvent.time_req)
-        #     if anEvent.gold_req > 0:
-        #         self.spend_gold(anEvent.gold_req)
-        #     for field, change in anEvent.stats:
-        #         if field != "hp":
-        #             minVal = math.fabs(change)
-        #             toChange = random.randint(minVal, minVal * 2)
-        #             if change < 0: toChange = -toChange
-        #         else:
-        #             toChange = change
-        #         self.stat(field, toChange) #MORE RANDOM!
-        #     if anEvent.printing:
-        #         possibs = [("gold", anEvent.gold_req),
-        #                    ("hrs", anEvent.time_req),
-        #                    ("hp", anEvent.life_req)]
-        #         to_print = [s for s, val in possibs + anEvent.stats if val > 0]
-        #         # print to_print
-        #         self.print_stat(to_print)
-        # if self.not_dead():
-        #     self.move(anEvent.destination)
-        #     # cm(anEvent.destination)
-        #     # TODO: FIX THIS. WHO DOES THIS.
-        #     # eval("self." + anEvent.destination + "()")
-        # else:
-        #     #handled in not_dead()
-        #     return
-        #     # print "ERROR IN EVENT RETURN: %s" % self
+
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@
     #
@@ -318,6 +283,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         clear()
         if refresh:
             self.hrs = 16
+            self.day += 1
         print """Welcome to:
 
   _____
@@ -393,44 +359,16 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "d":
             self.run_event(events.tavern.DRINK)
         elif val == "s":
-            self.sleep()
+            self.run_event(events.tavern.SLEEP)
         elif val == "g":
-            self.gamble()
+            self.run_event(events.tavern.GAMBLE)
         elif val == "b":
-            self.bartend()
+            self.run_event(events.tavern.BARTEND)
         elif val == "t":
             self.move("town", False)
         else:
             self.save_prompt()
             raise Exception("ERROR IN TAVERN SELECT")
-        return
-
-    def sleep(self):
-        if self.requires(0, 0, 0):
-            print "You sleep for the night"
-            heal = int(math.ceil(int(self.vit) / 4))
-            self.stat("hp", heal)
-            self.stat("day")
-        else:
-            self.save_prompt()
-            raise Exception("ERROR IN SLEEP")
-        self.move("townR")
-        return
-
-
-    def gamble(self):
-        if self.requires():
-            print "You play a hand of cards"
-            chance = random.randint(1 + self.luck, 1000)
-            if chance > 900:
-                print 'You win!'
-                self.spend_gold(-10)
-            else:
-                print 'You lose.'
-                self.spend_gold()
-            self.time_pass(1)
-            self.print_stat(["gold"])
-        self.move("tavern")
         return
 
     def bartend(self):

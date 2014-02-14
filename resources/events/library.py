@@ -1,7 +1,7 @@
 import event
 import math
 
-
+#STUDY
 STUDY = event.Event(
     gold_req=0,
     time_req=1,
@@ -11,7 +11,7 @@ and the arcane arts.""",
     stats=[("int", 1)],
     destination="library")
 
-
+#BOOK
 BOOK = event.Event(
     gold_req=1,
     time_req=3,
@@ -20,7 +20,7 @@ BOOK = event.Event(
     stats=[("int", 4)],
     destination="library")
 
-
+#TUTOR
 TUTOR = event.Event(
     gold_req=3,
     time_req=3,
@@ -30,7 +30,7 @@ some incredibly difficult magic""",
     stats=[("int", 7)],
     destination="library")
 
-
+#READ
 def read_process(self, character):
     heal = int(math.ceil(int(character.vit) / 10))
     self.stats = [("hp", heal)]
