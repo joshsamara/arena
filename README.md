@@ -20,7 +20,7 @@ Open a terminal and run:
 
 `cd ~/arena`
 
-`python arena.py`
+`python main.py`
 
 The game is played from a terminal window.
 You can create and load a single local save file

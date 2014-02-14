@@ -1,10 +1,12 @@
 import time
 import math
+import random
 import events
 import pickle
+import save
+from arena import goto_arena
 from locations import *
 from common import *
-from fight import *
 
 
 class Character(object):
@@ -64,14 +66,6 @@ class Character(object):
         if printing:
             cm(place)
         return
-
-    def save(self):
-        save_file = open('save/arena.save', 'w')
-        temp = self.next
-        self.next = None
-        pickle.dump(self, save_file)
-        self.next = temp
-        save_file.close()
 
     #
     # STAT MANAGEMENT
@@ -177,6 +171,18 @@ class Character(object):
         next_lvl = self.calc_needed_xp() - self.calc_needed_xp(self.lvl - 1)
         return int(100 * this_lvl/next_lvl)
 
+    def damage_calc(stats):
+        # TODO: balance, crits?
+        base = int(stats.wep * (stats.str + stats.int))
+        rand = random.randint(
+            int(stats.agil),
+            1 + int(stats.luck + stats.agil))
+        return random.randint(base, base + rand)
+
+    def damage_reduce(stats, damage, char=True):
+        # TODO: agi = Dodge?
+        return int(damage - stats.defense)
+
     #
     # STAT PRINTING
     #
@@ -221,58 +227,14 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             print "Time: %s" % self.hrs
         print_bar(1)
 
-    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
-    #
-    # GENERIC EVENT TEMPLATE
-    #
-    # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     def run_event(self, anEvent):
         return anEvent.run_default(self)
 
-
-    # @@@@@@@@@@@@@@@@@@@@@@@@@
     #
-    # Events
+    # Go places
     #
-    # @@@@@@@@@@@@@@@@@@@@@@@@@
-
     def save_prompt(self):
-        clear()
-        print color("""
-
-  ____
- / ___|  __ ___   _____
- \___ \ / _` \ \ / / _ \\
-  ___) | (_| |\ V /  __/
- |____/ \__,_| \_/ \___|
-""", "pink")
-
-        print_bar(0)
-        print "Name:  %s" % self.name
-        self.print_useful(True)
-        save_options = [make_option('Save', 'S'),
-                        make_option('Save and Exit', 'E'),
-                        make_option('Quit', 'Q'),
-                        make_option('Return', 'R')]
-
-        print nav_menu(save_options, short=True)
-        val = get_val("qsre")
-
-        if "s" == val:
-            self.save()
-            self.move("town")
-
-        elif "e" == val:
-            self.save()
-            exit()
-
-        elif "q" == val:
-            exit()
-
-        elif "r" == val:
-            self.move("town", printing = False)
-        return
-
+        save.prompt(self)
 
     def town(self, refresh=True):
         goto_town(self, refresh)
@@ -288,138 +250,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
 
     def smith(self):
         goto_smith(self)
-        
-
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-    #     _
-    #    / \   _ __ ___ _ __   __ _
-    #   / _ \ | '__/ _ \ '_ \ / _` |
-    #  / ___ \| | |  __/ | | | (_| |
-    # /_/   \_\_|  \___|_| |_|\__,_|
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-
+    
     def arena(self):
-        clear()
-        print "Welcome to the:"
-        print color("""
-     _
-    / \\   _ __ ___ _ __   __ _
-   / _ \\ | '__/ _ \\ '_ \\ / _` |
-  / ___ \\| | |  __/ | | | (_| |
- /_/   \\_\\_|  \\___|_| |_|\\__,_|
- """, "red")
-        self.print_useful()
-        arena_options = [make_option('Fight!', 'F', time=1, hp='?'),
-                         make_option('Return to Town', 'T')]
+        goto_arena(self)
 
-        print nav_menu(arena_options)
-
-        val = get_val("ft")
-
-        clear()
-        if val == "f":
-            self.fight()
-        elif val == "t":
-            self.move("town", False)
-        else:
-            self.save_prompt()
-            print "ERROR IN ARENA SELECT"
-        return
-            
-
-    def fight(self):
-        if self.requires(0, 1):
-            self.time_pass(1)
-            enemy = Enemy(pick_diff(self.lvl))
-            self.battle(enemy)
-        self.move("town")
-        return
-
-    def victory(self, enemy):
-        print "You win!"
-        self.stat("xp", enemy.calc_exp())
-        self.stat("gold", enemy.calc_gold())
-        self.check_lvlup()
-        self.move("town")
-        return
-
-    def battle(self, enemy, message="\n>" * 4):
-        self.battle_display(enemy, message)
-        val = get_val("ar")
-        clear()
-        if val == "a":
-            enemy, message = self.attack(enemy)
-            if self.not_dead():
-                if enemy.not_dead():
-                    self.battle(enemy, message)
-                else:
-                    self.victory(enemy)
-            else:
-                print "Error in battle"
-        elif val == "r":
-            self.move("town")
-        else:
-            self.save_prompt()
-            raise Exception ("ERROR IN BATTLE SELECT")
-        return
-
-    def battle_display(self, enemy, message):
-        print "-" * 40
-        print "Enemy: %s" % enemy.type
-        print "Level: %s" % enemy.lvl
-        ticks = min(
-            int(math.ceil(enemy.hp / (enemy.lvl * 250.0) * 25.0)),
-            25)
-        healthbar = color(" " * ticks, "redh") + " " * (25 - ticks)
-        print "HP: [%s]" % healthbar
-        print "-" * 40
-        print message
-        print_bar(2)
-        print "Options:"
-        print "Attack!                   (A)"
-        print "Run!                      (R)"
-        print_bar(2)
-        print "\n"
-        print "-" * 40
-        your_ticks = min(
-            int(math.ceil(float(self.hp) / self.vit * 25.0)),
-            25)
-        your_healthbar = color(" " * your_ticks, "greenh") + " " * (25 - your_ticks)
-        print "You:"
-        print "HP: [%s] %s/%s" % (your_healthbar, self.hp, self.vit)
-        print "-" * 40
-        return
-
-    def attack(self, enemy):
-        my_damage = self.damage_calc()
-        enemy_damage = enemy.damage_calc()
-        damage_to_me = self.damage_reduce(enemy_damage)
-        damage_to_enemy = enemy.damage_reduce(my_damage)
-        self.hp -= damage_to_me
-        self.hp = max(self.hp, 0)  # SAFEGAURD AGAINST NEGATIVE HP
-        enemy.hp -= damage_to_enemy
-        enemy.hp = max(enemy.hp, 0)
-        you_deal = color("You deal:    %s damage", "green") % damage_to_enemy
-        enemy_deal = color("Enemy deals: %s damage", "red") % damage_to_me
-        message = """
->
-> %s
-> %s
-> """ % (you_deal, enemy_deal)
-        return enemy, message
-
-    def damage_calc(stats):
-        # TODO: balance, crits?
-        base = int(stats.wep * (stats.str + stats.int))
-        rand = random.randint(
-            int(stats.agil),
-            1 + int(stats.luck + stats.agil))
-        return random.randint(base, base + rand)
-
-    def damage_reduce(stats, damage, char=True):
-        # TODO: agi = Dodge?
-        return int(damage - stats.defense)
