@@ -1,4 +1,6 @@
 import event
+import math
+
 
 STUDY = event.Event(
     gold_req=0,
@@ -31,7 +33,7 @@ some incredibly difficult magic""",
 
 def read_process(self, character):
     heal = int(math.ceil(int(character.vit) / 10))
-    self.stats = (("hp", heal))
+    self.stats = [("hp", heal)]
 
 READ = event.Event(
     gold_req=0,
@@ -39,4 +41,5 @@ READ = event.Event(
     life_req=0,
     message="You read a nice fiction book and rest",
     stats=[],
-    destination="library")
+    destination="library",
+    process=read_process)

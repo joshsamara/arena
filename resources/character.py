@@ -29,6 +29,13 @@ class Character(object):
         self.next = self.town
         self.args = []
 
+    def __str__(self):
+        d = self.__dict__
+        r = ""
+        for key in d:
+            r += "%-5s: %5s\n" % (key, d[key])
+        return r
+
     def run(self):
         self.next(*self.args)
 
@@ -40,6 +47,7 @@ class Character(object):
             self.args = [False]
         elif place == "townR":
             self.next = self.town
+            place = "town"
         elif place == "tavern":
             self.next = self.tavern
         elif place == "library":
@@ -223,37 +231,38 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
     #
     # @@@@@@@@@@@@@@@@@@@@@@@@@@@@
     def run_event(self, anEvent):
-        print "RUNNING EVENT"
-        if self.requires(anEvent.gold_req, anEvent.time_req, anEvent.life_req):
-            anEvent.run_process(self)
-            print anEvent.message
-            self.time_pass(anEvent.time_req)
-            if anEvent.gold_req > 0:
-                self.spend_gold(anEvent.gold_req)
-            for field, change in anEvent.stats:
-                if field != "hp":
-                    minVal = math.fabs(change)
-                    toChange = random.randint(minVal, minVal * 2)
-                    if change < 0: toChange = -toChange
-                else:
-                    toChange = change
-                self.stat(field, toChange) #MORE RANDOM!
-            if anEvent.printing:
-                possibs = [("gold", anEvent.gold_req),
-                           ("hrs", anEvent.time_req),
-                           ("hp", anEvent.life_req)]
-                to_print = [s for s, val in possibs + anEvent.stats if val > 0]
-                # print to_print
-                self.print_stat(to_print)
-        if self.not_dead():
-            self.move(anEvent.destination)
-            # cm(anEvent.destination)
-            # TODO: FIX THIS. WHO DOES THIS.
-            # eval("self." + anEvent.destination + "()")
-        else:
-            #handled in not_dead()
-            return
-            # print "ERROR IN EVENT RETURN: %s" % self
+        return anEvent.run_default(self)
+        # # print "RUNNING EVENT"
+        # if self.requires(anEvent.gold_req, anEvent.time_req, anEvent.life_req):
+        #     anEvent.run_process(self)
+        #     print anEvent.message
+        #     self.time_pass(anEvent.time_req)
+        #     if anEvent.gold_req > 0:
+        #         self.spend_gold(anEvent.gold_req)
+        #     for field, change in anEvent.stats:
+        #         if field != "hp":
+        #             minVal = math.fabs(change)
+        #             toChange = random.randint(minVal, minVal * 2)
+        #             if change < 0: toChange = -toChange
+        #         else:
+        #             toChange = change
+        #         self.stat(field, toChange) #MORE RANDOM!
+        #     if anEvent.printing:
+        #         possibs = [("gold", anEvent.gold_req),
+        #                    ("hrs", anEvent.time_req),
+        #                    ("hp", anEvent.life_req)]
+        #         to_print = [s for s, val in possibs + anEvent.stats if val > 0]
+        #         # print to_print
+        #         self.print_stat(to_print)
+        # if self.not_dead():
+        #     self.move(anEvent.destination)
+        #     # cm(anEvent.destination)
+        #     # TODO: FIX THIS. WHO DOES THIS.
+        #     # eval("self." + anEvent.destination + "()")
+        # else:
+        #     #handled in not_dead()
+        #     return
+        #     # print "ERROR IN EVENT RETURN: %s" % self
 
     # @@@@@@@@@@@@@@@@@@@@@@@@@
     #

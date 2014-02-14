@@ -1,4 +1,5 @@
 import event
+import random
 
 DUMMY = event.Event(
     gold_req=0,
