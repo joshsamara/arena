@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 from resources.character import *
 
 # TODO LIST:

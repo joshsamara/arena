@@ -2,6 +2,7 @@ import time
 import math
 import events
 import pickle
+from locations import *
 from common import *
 from fight import *
 
@@ -269,249 +270,25 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             exit()
 
         elif "r" == val:
-            self.move("town")
+            self.move("town", printing = False)
         return
 
-    #   
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-    # Town
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
+
     def town(self, refresh=True):
-        clear()
-        if refresh:
-            self.hrs = 16
-            self.day += 1
-        print """Welcome to:
+        goto_town(self, refresh)
 
-  _____
- |_   _|____      ___ __
-   | |/ _ \ \ /\ / / '_ \\
-   | | (_) \ V  V /| | | |
-   |_|\___/ \_/\_/ |_| |_|
-"""
-
-        self.print_useful()
-        town_options = [make_option('Enter the Tavern', 'T'),
-                        make_option('Go to the Library', 'L'),
-                        make_option('Go to the Trainng Fields', 'F'),
-                        make_option('Visit the Blacksmith', 'B'),
-                        make_option('Enter the Arena', 'A'),
-                        make_option('Save and/or exit the game', 'S')]         
-        print nav_menu(town_options, short=True)
-        val = get_val("stlfba9")
-
-        if val == "s":
-            self.save_prompt()
-        elif val == "t":
-            self.move("tavern", False)
-        elif val == "l":
-            self.move("library", False)
-        elif val == "f":
-            self.move("fields", False)
-        elif val == "b":
-            self.move("smith", False)
-        elif val == "a":
-            self.move("arena", False)
-        elif val == "9":
-            self.gold += 100
-            self.hrs += 100
-            self.hp += 100
-            self.move("town")
-        else:
-            self.save_prompt()
-            raise Exception("ERROR IN TOWN SELECT")
-        return
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-    # Tavern
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
     def tavern(self):
-        clear()
-        print "Welcome to the:"
-        print color("""
-  _____
- |_   _|_ ___   _____ _ __ _ __
-   | |/ _` \ \ / / _ \ '__| '_ \\
-   | | (_| |\ V /  __/ |  | | | |
-   |_|\__,_| \_/ \___|_|  |_| |_|
-""", "yellow")
+        goto_tavern(self)
 
-        self.print_useful()
-
-        tavern_options = [make_option('Buy a Meal', 'M', gold=1, time=1),
-                          make_option('Grab a Drink', 'D', gold=1, time=1, hp=.1),
-                          make_option('Go to Sleep', 'S'),
-                          make_option('Gamble some gold', 'G', gold=1, time=1),
-                          make_option('Bartend', 'B', time = 8),
-                          make_option('Return to Town', 'T')]
-        print nav_menu(tavern_options)
-
-        val = get_val("mdsgbt")
-        clear()
-        if val == "m":
-            self.run_event(events.tavern.EAT)
-        elif val == "d":
-            self.run_event(events.tavern.DRINK)
-        elif val == "s":
-            self.run_event(events.tavern.SLEEP)
-        elif val == "g":
-            self.run_event(events.tavern.GAMBLE)
-        elif val == "b":
-            self.run_event(events.tavern.BARTEND)
-        elif val == "t":
-            self.move("town", False)
-        else:
-            self.save_prompt()
-            raise Exception("ERROR IN TAVERN SELECT")
-        return
-
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-    # Library
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
     def library(self):
-        clear()
-        print "Welcome to the:"
-        print color("""
-  _       _
- | |   (_) |__  _ __ __ _ _ __ _   _
- | |   | | '_ \| '__/ _` | '__| | | |
- | |___| | |_) | | | (_| | |  | |_| |
- |_____|_|_.__/|_|  \__,_|_|   \__, |
-                                |___/
-""", "teal")
-
-
-        self.print_useful(True)
-        library_options = [make_option('Study Magics', 'S', time=1),
-                           make_option('Borrow a book', 'B', gold=1, time=3),
-                           make_option('Hire a tutor', 'H', gold=3, time=3),
-                           make_option('Read and relax', 'R', time=1),
-                           make_option('Tutor Magics', 'M', time = 8),
-                           make_option('Return to Town', 'T')]
-        print nav_menu(library_options)
-
-
-        val = get_val("sbhrmt")
-        clear()
-        if val == "s":
-            self.run_event(events.library.STUDY)
-        elif val == "b":
-            self.run_event(events.library.BOOK)
-        elif val == "h":
-            self.run_event(events.library.TUTOR)
-        elif val == "r":
-            self.run_event(events.library.READ)
-        elif val == "m":
-            self.run_event(events.library.MAGICS)
-        elif val == "t":
-            self.move("town", False)
-        else:
-            self.save_prompt()
-            raise Exception("ERROR IN LIBRARY SELECT")
-        return
-
-
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-    # Training Fields
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
+        goto_library(self)
 
     def fields(self):
-        clear()
-        print "Welcome to the:"
-        print color("""
-  _____        _     _
- |  ___(_) ___| | __| |___
- | |_  | |/ _ \ |/ _` / __|
- |  _| | |  __/ | (_| \__ \\
- |_|   |_|\___|_|\__,_|___/
-""", "green")
-        self.print_useful()
+        goto_fields(self)
 
-        field_options = [make_option('Fight a training Dummy','D', time=2),
-                         make_option('Spar a Battle Master',  'M', gold=1, time=3, hp=.1),
-                         make_option('Run an obstacle Course','C', time=2),
-                         make_option('Enter a Race',          'R', gold=3, time=1),
-                         make_option('Perform Show tricks',   'S', time = 8),
-                         make_option('Return to Town',        'T')]
-        print nav_menu(field_options)
-
-        val = get_val("dmcrst")
-        clear()
-        if val == "d":
-            self.run_event(events.fields.DUMMY)
-        elif val == "m":
-            self.run_event(events.fields.MASTER)
-        elif val == "c":
-            self.run_event(events.fields.COURSE)
-        elif val == "r":
-            self.run_event(events.fields.RACE)
-        elif val == "s":
-            self.run_event(events.fields.SHOW)
-        elif val == "t":
-            self.move("town", False)
-        else:
-            self.save_prompt()
-            raise Exception("ERROR IN FIELDS SELECT")
-        return
-
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
-    # Black Smith
-    #
-    # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
-    #
     def smith(self):
-        clear()
-        print "Welcome to the:"
-        print color("""
-  ____            _ _   _
- / ___| _ __ ___ (_) |_| |__
- \___ \| '_ ` _ \| | __| '_ \\
-  ___) | | | | | | | |_| | | |
- |____/|_|_|_| |_|_|\__|_| |_|
- """, "blue")
-        self.print_useful()
-
-        smith_options = [make_option('Upgrade your Weapon', 'W', gold='?'),
-                         make_option('Upgrade your Armor ', 'A', gold='?'),
-                         make_option('Mine ores', 'M', time = 4),
-                         make_option('Work the Forge', 'F', time = 8),
-                         make_option('Return to Town', 'T')]
-
-        print nav_menu(smith_options)
-        val = get_val("wamft")
-
-        clear()
-        if val == "w":
-            events.smith.wepup(self)
-        elif val == "a":
-            events.smith.armup(self)
-        elif val == "m":
-            self.run_event(events.smith.MINE)
-        elif val == "f":
-            self.run_event(events.smith.FORGE)
-        elif val == "t":
-            self.move("town", False)
-        else:
-            self.save_prompt()
-            raise Exception("ERROR IN FIELDS SELECT")
-        return
-
+        goto_smith(self)
+        
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
