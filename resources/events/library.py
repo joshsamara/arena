@@ -43,3 +43,18 @@ READ = event.Event(
     stats=[],
     destination="library",
     process=read_process)
+
+#MAGICS
+def magics_process(self, character):
+    self.stats = event.work(character, 5, "int", 10)
+
+MAGICS = event.Event(
+    gold_req=0,
+    time_req=8,
+    life_req=0,
+    message="You work a day teaching magic to others",
+    stats=[],
+    destination="library",
+    process=magics_process
+    )
+

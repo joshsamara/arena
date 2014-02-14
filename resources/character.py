@@ -371,15 +371,6 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             raise Exception("ERROR IN TAVERN SELECT")
         return
 
-    def bartend(self):
-        if self.requires(0, 8):
-            print "You work at the bar for a few hours"
-            self.work(1, "luck", 3)
-            self.time_pass(8)
-            self.print_stat(["gold"])
-        self.move("tavern")
-        return
-
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #
@@ -421,7 +412,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "r":
             self.run_event(events.library.READ)
         elif val == "m":
-            self.magics()
+            self.run_event(events.library.MAGICS)
         elif val == "t":
             self.move("town", False)
         else:
@@ -429,14 +420,6 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             raise Exception("ERROR IN LIBRARY SELECT")
         return
 
-    def magics(self):
-        if self.requires(0, 8):
-            print "You work a day teaching magic to others"
-            self.work(5, "int", 10)
-            self.time_pass(8)
-            self.print_stat(["gold"])
-        self.move("library")
-        return
 
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
@@ -477,21 +460,12 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         elif val == "r":
             self.run_event(events.fields.RACE)
         elif val == "s":
-            self.show()
+            self.run_event(events.fields.SHOW)
         elif val == "t":
             self.move("town", False)
         else:
             self.save_prompt()
             raise Exception("ERROR IN FIELDS SELECT")
-        return
-
-    def show(self):
-        if self.requires(0, 8):
-            print "You spend a day performing tricks"
-            self.work(3, "agil", 7)
-            self.time_pass(8)
-            self.print_stat(["gold"])
-        self.move("fields")
         return
 
     #
@@ -524,13 +498,13 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
 
         clear()
         if val == "w":
-            self.wepup()
+            events.smith.wepup(self)
         elif val == "a":
-            self.armup()
+            events.smith.armup(self)
         elif val == "m":
             self.run_event(events.smith.MINE)
         elif val == "f":
-            self.forge()
+            self.run_event(events.smith.FORGE)
         elif val == "t":
             self.move("town", False)
         else:
@@ -538,59 +512,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
             raise Exception("ERROR IN FIELDS SELECT")
         return
 
-    def wepup(self):
-        clear()
-        cost = int(math.pow(10, self.wep))
-        print_bar(0)
-        print "Current weapon level:   %s" % self.wep
-        print "Current upgrade cost:   %s gold" % cost
-        print "Current gold        :   %s gold" % self.gold
-        print_bar(1)
-        print "Would you like to upgrade your weapon? (y/n)"
 
-        val = get_val("yn")
-        clear()
-        if val == "y":
-            if self.requires(cost, 0):
-                print "You upgrade your weapon."
-                self.stat("wep")
-                self.print_stat(["wep"])
-        elif val == "n":
-            print "You decide to save upgrading for later"
-        self.move("smith")
-        return
-
-    def armup(self):
-        clear()
-        cost = int(math.pow(10, self.defense))
-        print_bar(0)
-        print "Current armor level:    %s" % self.defense
-        print "Current upgrade cost:   %s gold" % cost
-        print "Current gold        :   %s gold" % self.gold
-        print_bar(1)
-        print "Would you like to upgrade your armor? (y/n)"
-
-        val = get_val("yn")
-        clear()
-
-        if val == "y":
-            if self.requires(cost, 0):
-                print "You upgrade your armor."
-                self.stat("defense")
-                self.print_stat(["defense"])
-        elif val == "n":
-            print "You decide to save upgrading for later"
-        self.move("smith")
-        return
-
-    def forge(self):
-        if self.requires(0, 8):
-            print "You forging weapons and armor"
-            self.work(10, "str", 10)
-            self.time_pass(8)
-            self.print_stat(["gold"])
-        self.move("smith")
-        return
     #
     # @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @ @
     #

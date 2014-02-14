@@ -1,6 +1,7 @@
 import event
 import math
 
+#DUMMY
 DUMMY = event.Event(
     gold_req=0,
     time_req=2,
@@ -13,6 +14,7 @@ def master_process(self, character):
     hurt = int(math.ceil(character.vit / 10))
     self.life_req = hurt
 
+#MASTER
 MASTER = event.Event(
     gold_req=1,
     time_req=3,
@@ -24,6 +26,7 @@ You take a few hits though.""",
     destination="fields",
     process= master_process)
 
+#COURSE
 COURSE = event.Event(
     gold_req=0,
     time_req=2,
@@ -32,6 +35,7 @@ COURSE = event.Event(
     stats=[("agil", 1)],
     destination="fields")
 
+#RACE
 RACE = event.Event(
     gold_req=3,
     time_req=1,
@@ -39,3 +43,17 @@ RACE = event.Event(
     message="You run a race and it really works your muscles.",
     stats=[("agil", 3)],
     destination="fields")
+
+#SHOW
+def show_process(self, character):
+    self.stats = event.work(character, 3, "agil", 7)
+
+SHOW = event.Event(
+    gold_req=0,
+    time_req=8,
+    life_req=0,
+    message="You spend a day performing tricks",
+    stats=[],
+    destination="fields",
+    process=show_process
+    )
