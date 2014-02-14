@@ -1,5 +1,5 @@
 import event
-import random
+import math
 
 DUMMY = event.Event(
     gold_req=0,
@@ -9,6 +9,10 @@ DUMMY = event.Event(
     stats=[("str", 1)],
     destination="fields")
 
+def master_process(self, character):
+    hurt = int(math.ceil(character.vit / 10))
+    self.life_req = hurt
+
 MASTER = event.Event(
     gold_req=1,
     time_req=3,
@@ -17,7 +21,8 @@ MASTER = event.Event(
 He shows you a thing or two about fighting.
 You take a few hits though.""",
     stats=[("str", 6)],
-    destination="fields")
+    destination="fields",
+    process= master_process)
 
 COURSE = event.Event(
     gold_req=0,

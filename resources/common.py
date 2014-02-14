@@ -128,25 +128,35 @@ def color(text, color):
 # print "Return to Town            (T)  --  ---  ----"
 
 def make_option(description, hotkey, gold = 0, time = 0, hp = 0):
-    if gold == 0: 
-        gold = '--'
-    else:
-        gold = '%sg' % gold
+    items = {"gold":gold, "time":time, "hp": hp}
+    #want something mutable for tricks
+    for key in items:
+        if items[key] < 1 and items[key] > 0:
+            items[key] = "%d%% " % (items[key]*100)
 
-    if time == 0:
-        time = '---'
-    else:
-        time = '%shr' % time
+    if items["gold"] == 0: 
+        items["gold"] = '--'
+    elif items["gold"]:
+        items["gold"] = '%sg' % items["gold"]
 
-    if hp == 0:
-        hp = '---'
+    if items["time"] == 0:
+        items["time"] = '---'
     else:
-        hp = "%shp" % hp
+        items["time"] = '%shr' % items["time"]
+
+    if items["hp"] == 0:
+        items["hp"] = '---'
+    else:
+        items["hp"] = "%shp" % items["hp"]
 
     hotkey = hotkey.upper()
 
 
-    return {'description':description, 'hotkey': hotkey, 'gold':gold, 'time':time, 'hp':hp}
+    return {'description':description, 
+            'hotkey': hotkey, 
+            'gold':items["gold"], 
+            'time':items["time"], 
+            'hp':items["hp"]}
 
 def nav_menu(option_list, short = False):
     text = "Here you can do any of the following:\n"

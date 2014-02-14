@@ -129,7 +129,7 @@ class Character(object):
     def requires(self, gold=1, hours=1, life=1):
         goldcheck = self.gold < gold
         hourcheck = self.hrs < hours
-        lifecheck = self.hp < life
+        lifecheck = self.hp <= life
 
         if goldcheck or hourcheck or lifecheck:
             print "Impossible!"
@@ -379,7 +379,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         self.print_useful()
 
         tavern_options = [make_option('Buy a Meal', 'M', gold=1, time=1),
-                          make_option('Grab a Drink', 'D', gold=1, time=1, hp=1),
+                          make_option('Grab a Drink', 'D', gold=1, time=1, hp=.1),
                           make_option('Go to Sleep', 'S'),
                           make_option('Gamble some gold', 'G', gold=1, time=1),
                           make_option('Bartend', 'B', time = 8),
@@ -521,7 +521,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         self.print_useful()
 
         field_options = [make_option('Fight a training Dummy','D', time=2),
-                         make_option('Spar a Battle Master',  'M', gold=1, time=3, hp=1),
+                         make_option('Spar a Battle Master',  'M', gold=1, time=3, hp=.1),
                          make_option('Run an obstacle Course','C', time=2),
                          make_option('Enter a Race',          'R', gold=3, time=1),
                          make_option('Perform Show tricks',   'S', time = 8),

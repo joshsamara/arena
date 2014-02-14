@@ -27,12 +27,14 @@ class Event(object):
 
     def run_default(self, character):
     # print "RUNNING EVENT"
+        print self.life_req
         if character.requires(self.gold_req, self.time_req, self.life_req):
-            self.run_process(character)
             print self.message
             character.time_pass(self.time_req)
             if self.gold_req > 0:
                 character.spend_gold(self.gold_req)
+            if self.life_req > 0:
+                character.stat("hp", -1 * self.life_req)
             for field, change in self.stats:
                 if field != "hp":
                     minVal = math.fabs(change)
@@ -40,7 +42,9 @@ class Event(object):
                     if change < 0: toChange = -toChange
                 else:
                     toChange = change
+                    
                 character.stat(field, toChange) #MORE RANDOM!
+
             if self.printing:
                 possibs = [("gold", self.gold_req),
                            ("hrs", self.time_req),

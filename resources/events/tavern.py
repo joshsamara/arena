@@ -19,9 +19,8 @@ It's relieving after a long day""",
 
 
 def drink_process(self, character):
-    hurt = -int(math.ceil(character.vit / 10))
-    self.stats = [("hp", hurt), ("luck", 2)]
-
+    hurt = int(math.ceil(character.vit / 10))
+    self.life_req = hurt
 
 DRINK = event.Event(
     gold_req=1,
@@ -29,6 +28,6 @@ DRINK = event.Event(
     life_req=1,
     message="""You have a drink at the bar
 You practice some dice and card games""",
-    stats=[],
+    stats=[("luck", 2)],
     destination="tavern",
     process=drink_process)
