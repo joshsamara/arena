@@ -1,20 +1,23 @@
 #!/usr/bin/env python
+"""Terminal based Arena rpg game. Run with ./main.py."""
+
 from resources.character import *
 
+
 # TODO LIST:
-# Generic work function
 # MAX Stats (999) stop increasing after?
-# Color printing?
 # Balance
 # End Game
 # More comments!
 # Windows compatibility (independent app?)
-# Pickle for saving
 # Better intro
 # Version next: Graphics (Pygame, PyGTK)?
-
+# Logger
+# Multiple Saves
 
 def load():
+    """Load a character and set it as the current Character."""
+
     global NEW_GAME
     loaded = False
     try:
@@ -45,12 +48,11 @@ def load():
             NEW_GAME = True
             cm()
 
-    except IOError as ErrorMessage:
-        # print ErrorMessage
+    except IOError:
         print "No save file found!"
         NEW_GAME = True
         cm()
-    except EOFError as e:
+    except EOFError:
         print "Invalid save file found!"
         NEW_GAME = True
         cm()

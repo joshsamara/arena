@@ -58,7 +58,8 @@ class Event(object):
 
         #alive check
         if character.not_dead():
-            return character.move(self.destination)
+            character.move(self.destination)
+            return
         else:
             #handled in not_dead()
             return

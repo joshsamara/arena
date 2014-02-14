@@ -1,8 +1,10 @@
-import random
+"""Handle all character axtions in the arena."""
 from common import *
 from fight import *
 
+
 def goto_arena(character):
+    """Enter the arena selection screen."""
     clear()
     print "Welcome to the:"
     print color("""
@@ -29,9 +31,10 @@ def goto_arena(character):
         character.save_prompt()
         print "ERROR IN ARENA SELECT"
     return
-        
+
 
 def fight(character):
+    """Enter the battle if character has an hour."""
     if character.requires(0, 1):
         character.time_pass(1)
         enemy = Enemy(pick_diff(character.lvl))
@@ -39,7 +42,9 @@ def fight(character):
     character.move("town")
     return
 
+
 def victory(character, enemy):
+    """Win the battle, increase xp, return to town."""
     print "You win!"
     character.stat("xp", enemy.calc_exp())
     character.stat("gold", enemy.calc_gold())
@@ -47,7 +52,9 @@ def victory(character, enemy):
     character.move("town")
     return
 
+
 def battle(character, enemy, message="\n>" * 4):
+    """Continuously battle an enemy until dead, win or run."""
     battle_display(character, enemy, message)
     val = get_val("ar")
     clear()
@@ -64,7 +71,7 @@ def battle(character, enemy, message="\n>" * 4):
         character.move("town")
     else:
         character.save_prompt()
-        raise Exception ("ERROR IN BATTLE SELECT")
+        raise Exception("ERROR IN BATTLE SELECT")
     return
 
 def battle_display(character, enemy, message):
