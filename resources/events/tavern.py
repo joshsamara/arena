@@ -1,9 +1,12 @@
+"""Tavern events."""
 import event
 import math
 import random
 
+
 #SLEEP
 def sleep_process(self, character):
+    """Process sleep event."""
     heal = int(math.ceil(int(character.vit) / 4))
     self.life_req = -1 * heal
 
@@ -16,8 +19,10 @@ SLEEP = event.Event(
     destination="townR",
     process=sleep_process)
 
+
 #EAT
 def eat_process(self, character):
+    """Process eat event."""
     heal = int(math.ceil(int(character.vit) / 2))
     self.stats = [("hp", heal)]
 
@@ -31,8 +36,10 @@ It's relieving after a long day""",
     destination="tavern",
     process=eat_process)
 
+
 #DRINK
 def drink_process(self, character):
+    """Process drink event."""
     hurt = int(math.ceil(character.vit / 10))
     self.life_req = hurt
 
@@ -46,8 +53,10 @@ You practice some dice and card games""",
     destination="tavern",
     process=drink_process)
 
+
 #GAMBLE
 def gamble_process(self, character):
+    """Process gamble event."""
     msg = "You play a hand of cards\n"
     chance = random.randint(1 + character.luck, 1000)
     if chance > 90:
@@ -70,6 +79,7 @@ GAMBLE = event.Event(
 
 #BARTEND
 def bartend_process(self, character):
+    """Process bartend event."""
     self.stats = event.work(character, 1, "luck", 3)
 
 BARTEND = event.Event(

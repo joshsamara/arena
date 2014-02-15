@@ -1,9 +1,12 @@
+"""Functions for hubs of activatable events."""
 from common import *
 import events
 
 #TODO, abstract over these things
 
+
 def goto_town(character, refresh=True):
+    """Move character to town seletion screen."""
     clear()
     if refresh:
         character.hrs = 16
@@ -23,7 +26,7 @@ def goto_town(character, refresh=True):
                     make_option('Go to the Trainng Fields', 'F'),
                     make_option('Visit the Blacksmith', 'B'),
                     make_option('Enter the Arena', 'A'),
-                    make_option('Save and/or exit the game', 'S')]         
+                    make_option('Save and/or exit the game', 'S')]
     print nav_menu(town_options, short=True)
     val = get_val("stlfba9")
 
@@ -51,6 +54,7 @@ def goto_town(character, refresh=True):
 
 
 def goto_tavern(character):
+    """Move character to tavern seletion screen."""
     clear()
     print "Welcome to the:"
     print color("""
@@ -67,7 +71,7 @@ def goto_tavern(character):
                       make_option('Grab a Drink', 'D', gold=1, time=1, hp=.1),
                       make_option('Go to Sleep', 'S'),
                       make_option('Gamble some gold', 'G', gold=1, time=1),
-                      make_option('Bartend', 'B', time = 8),
+                      make_option('Bartend', 'B', time=8),
                       make_option('Return to Town', 'T')]
     print nav_menu(tavern_options)
 
@@ -90,7 +94,9 @@ def goto_tavern(character):
         raise Exception("ERROR IN TAVERN SELECT")
     return
 
+
 def goto_library(character):
+    """Move character to library seletion screen."""
     clear()
     print "Welcome to the:"
     print color("""
@@ -102,16 +108,14 @@ def goto_library(character):
                                 |___/
 """, "teal")
 
-
     character.print_useful(True)
     library_options = [make_option('Study Magics', 'S', time=1),
                        make_option('Borrow a book', 'B', gold=1, time=3),
                        make_option('Hire a tutor', 'H', gold=3, time=3),
                        make_option('Read and relax', 'R', time=1),
-                       make_option('Tutor Magics', 'M', time = 8),
+                       make_option('Tutor Magics', 'M', time=8),
                        make_option('Return to Town', 'T')]
     print nav_menu(library_options)
-
 
     val = get_val("sbhrmt")
     clear()
@@ -132,7 +136,9 @@ def goto_library(character):
         raise Exception("ERROR IN LIBRARY SELECT")
     return
 
+
 def goto_fields(character):
+    """Move character to field seletion screen."""
     clear()
     print "Welcome to the:"
     print color("""
@@ -144,11 +150,12 @@ def goto_fields(character):
 """, "green")
     character.print_useful()
 
-    field_options = [make_option('Fight a training Dummy','D', time=2),
-                     make_option('Spar a Battle Master',  'M', gold=1, time=3, hp=.1),
-                     make_option('Run an obstacle Course','C', time=2),
+    field_options = [make_option('Fight a training Dummy', 'D', time=2),
+                     make_option('Spar a Battle Master',  'M', gold=1, time=3,
+                                 hp=.1),
+                     make_option('Run an obstacle Course', 'C', time=2),
                      make_option('Enter a Race',          'R', gold=3, time=1),
-                     make_option('Perform Show tricks',   'S', time = 8),
+                     make_option('Perform Show tricks',   'S', time=8),
                      make_option('Return to Town',        'T')]
     print nav_menu(field_options)
 
@@ -171,7 +178,9 @@ def goto_fields(character):
         raise Exception("ERROR IN FIELDS SELECT")
     return
 
+
 def goto_smith(character):
+    """Move character to smith seletion screen."""
     clear()
     print "Welcome to the:"
     print color("""
@@ -185,8 +194,8 @@ def goto_smith(character):
 
     smith_options = [make_option('Upgrade your Weapon', 'W', gold='?'),
                      make_option('Upgrade your Armor ', 'A', gold='?'),
-                     make_option('Mine ores', 'M', time = 4),
-                     make_option('Work the Forge', 'F', time = 8),
+                     make_option('Mine ores', 'M', time=4),
+                     make_option('Work the Forge', 'F', time=8),
                      make_option('Return to Town', 'T')]
 
     print nav_menu(smith_options)

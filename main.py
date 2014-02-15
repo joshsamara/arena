@@ -2,7 +2,7 @@
 """Terminal based Arena rpg game. Run with ./main.py."""
 
 from resources.character import *
-
+import pickle
 
 # TODO LIST:
 # MAX Stats (999) stop increasing after?
@@ -14,6 +14,7 @@ from resources.character import *
 # Version next: Graphics (Pygame, PyGTK)?
 # Logger
 # Multiple Saves
+
 
 def load():
     """Load a character and set it as the current Character."""

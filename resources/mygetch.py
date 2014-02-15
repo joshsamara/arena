@@ -1,4 +1,15 @@
+"""Read single characer at a time from stdin."""
+
+
 class _GetchUnix:
+
+    """
+    Class to track individual stdin characters.
+
+    Taken from http://stackoverflow.com/questions/1052107/reading-a-single-char
+    acter-getch-style-in-python-is-not-working-in-unix
+
+    """
 
     def __init__(self):
         import tty

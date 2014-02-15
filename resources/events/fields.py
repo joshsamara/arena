@@ -1,3 +1,4 @@
+"""Field events."""
 import event
 import math
 
@@ -10,11 +11,13 @@ DUMMY = event.Event(
     stats=[("str", 1)],
     destination="fields")
 
+
+#MASTER
 def master_process(self, character):
+    """Process master event."""
     hurt = int(math.ceil(character.vit / 10))
     self.life_req = hurt
 
-#MASTER
 MASTER = event.Event(
     gold_req=1,
     time_req=3,
@@ -24,7 +27,7 @@ He shows you a thing or two about fighting.
 You take a few hits though.""",
     stats=[("str", 6)],
     destination="fields",
-    process= master_process)
+    process=master_process)
 
 #COURSE
 COURSE = event.Event(
@@ -44,8 +47,10 @@ RACE = event.Event(
     stats=[("agil", 3)],
     destination="fields")
 
+
 #SHOW
 def show_process(self, character):
+    """Process show event."""
     self.stats = event.work(character, 3, "agil", 7)
 
 SHOW = event.Event(

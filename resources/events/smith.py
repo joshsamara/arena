@@ -1,17 +1,21 @@
+"""Smith events."""
 import event
 import math
 from .. import common
 
-#type 0 for wep, type 1 for armor
+
 def upgrade(char, uptype):
+    """Generic upgrade function."""
+    #type 0 for wep, type 1 for armor
     if uptype == 0:
-        upstats = {"name":"weapon", "level":char.wep, "stat":"wep"}
+        upstats = {"name": "weapon", "level": char.wep, "stat": "wep"}
     else:
-        upstats = {"name":"armor", "level":char.defense, "stat":"defense"}
+        upstats = {"name": "armor", "level": char.defense, "stat": "defense"}
     common.clear()
     cost = int(math.pow(10, upstats["level"]))
     common.print_bar(0)
-    print "%-20s:   %s" % ("Current %s level" % upstats["name"], upstats["level"])
+    print "%-20s:   %s" % ("Current %s level" % upstats["name"],
+                           upstats["level"])
     print "Current upgrade cost:   %s gold" % cost
     print "Current gold        :   %s gold" % char.gold
     common.print_bar(1)
@@ -29,10 +33,14 @@ def upgrade(char, uptype):
     char.move("smith")
     return
 
+
 def wepup(character):
+    """Weapon upgrade function."""
     upgrade(character, 0)
 
+
 def armup(character):
+    """Armor upgrade function."""
     upgrade(character, 1)
 
 #MINE
@@ -43,12 +51,12 @@ MINE = event.Event(
     message="""You mine some ore for the smith\nmaking you more able
 to endure pain""",
     stats=[("vit", 5)],
-    destination="smith") 
-
+    destination="smith")
 
 
 #FORGE
 def forge_process(self, character):
+    """Forge process function."""
     self.stats = event.work(character, 10, "str", 10)
 
 FORGE = event.Event(

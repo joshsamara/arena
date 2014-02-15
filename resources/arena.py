@@ -74,7 +74,9 @@ def battle(character, enemy, message="\n>" * 4):
         raise Exception("ERROR IN BATTLE SELECT")
     return
 
+
 def battle_display(character, enemy, message):
+    """Display all battle information."""
     print "-" * 40
     print "Enemy: %s" % enemy.type
     print "Level: %s" % enemy.lvl
@@ -95,14 +97,17 @@ def battle_display(character, enemy, message):
     your_ticks = min(
         int(math.ceil(float(character.hp) / character.vit * 25.0)),
         25)
-    your_healthbar = color(" " * your_ticks, "greenh") + " " * (25 - your_ticks)
+    your_healthbar = color(" " * your_ticks, "greenh")
+    your_healthbar += " " * (25 - your_ticks)
     print "You:"
     print "Level: %s" % character.lvl
     print "HP: [%s] %s/%s" % (your_healthbar, character.hp, character.vit)
     print "-" * 40
     return
 
+
 def attack(character, enemy):
+    """Deal damage and show damage dealt. Return new enemy and message."""
     my_damage = character.damage_calc()
     enemy_damage = enemy.damage_calc()
     damage_to_me = character.damage_reduce(enemy_damage)

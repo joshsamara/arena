@@ -1,3 +1,4 @@
+"""Library Events."""
 import event
 import math
 
@@ -30,8 +31,10 @@ some incredibly difficult magic""",
     stats=[("int", 7)],
     destination="library")
 
+
 #READ
 def read_process(self, character):
+    """Process read event."""
     heal = int(math.ceil(int(character.vit) / 10))
     self.stats = [("hp", heal)]
 
@@ -44,8 +47,10 @@ READ = event.Event(
     destination="library",
     process=read_process)
 
+
 #MAGICS
 def magics_process(self, character):
+    """Process magics event."""
     self.stats = event.work(character, 5, "int", 10)
 
 MAGICS = event.Event(
@@ -57,4 +62,3 @@ MAGICS = event.Event(
     destination="library",
     process=magics_process
     )
-

@@ -1,5 +1,4 @@
 """Define character object and handle all actions directly involving."""
-
 import math
 import random
 import save
