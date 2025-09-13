@@ -1,7 +1,7 @@
 """Common Display Functions and resources."""
 import sys
 import os
-from mygetch import *
+from .mygetch import *
 
 
 ###Global information
@@ -31,7 +31,7 @@ PRETTY_STAT = {
 def cm(text=None):
     """Print a 'Press key to continue' message."""
     if text is None:
-        print "Press any key to continue..."
+        print("Press any key to continue...")
     elif text is not None:
         pretty_message = {"tavern": "Tavern", "library":
                           "Library", "town": "Town",
@@ -39,9 +39,9 @@ def cm(text=None):
                           "smith": "Blacksmith"}
         try:
             message = pretty_message[text.lower()]
-            print "\nPress any key to retun to the %s..." % message
+            print("\nPress any key to retun to the %s..." % message)
         except KeyError:
-            print text
+            print(text)
     getch()
 
 
@@ -58,7 +58,7 @@ def print_bar(version):
     elif version == 1:
         bar += "\n"
 
-    print color(bar, 'grey')
+    print(color(bar, 'grey'))
 
 # just give a string of valid inputs
 # you could give an array or something if you wanted
@@ -83,7 +83,7 @@ def get_val(inputs):
 
 def exit():
     """Print a message and exit the game."""
-    print "Goodbye"
+    print("Goodbye")
     sys.exit()
 
 

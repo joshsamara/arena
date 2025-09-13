@@ -1,5 +1,5 @@
 """Library Events."""
-import event
+from . import event
 import math
 
 #STUDY

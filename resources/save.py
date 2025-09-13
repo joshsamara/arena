@@ -1,6 +1,6 @@
 """Handle save prompt and character saving."""
 
-from common import *
+from .common import *
 import pickle
 
 
@@ -17,24 +17,24 @@ def save(character):
 def prompt(character):
     """Prompt for multiple save options."""
     clear()
-    print color("""
+    print(color("""
 
   ____
  / ___|  __ ___   _____
  \___ \ / _` \ \ / / _ \\
   ___) | (_| |\ V /  __/
  |____/ \__,_| \_/ \___|
-""", "pink")
+""", "pink"))
 
     print_bar(0)
-    print "Name:  %s" % character.name
+    print("Name:  %s" % character.name)
     character.print_useful(True)
     save_options = [make_option('Save', 'S'),
                     make_option('Save and Exit', 'E'),
                     make_option('Quit', 'Q'),
                     make_option('Return', 'R')]
 
-    print nav_menu(save_options, short=True)
+    print(nav_menu(save_options, short=True))
     val = get_val("qsre")
 
     if "s" == val:

@@ -1,6 +1,6 @@
 """Functions for hubs of activatable events."""
-from common import *
-import events
+from .common import *
+from . import events
 
 #TODO, abstract over these things
 
@@ -11,14 +11,14 @@ def goto_town(character, refresh=True):
     if refresh:
         character.hrs = 16
         character.day += 1
-    print """Welcome to:
+    print("""Welcome to:
 
   _____
  |_   _|____      ___ __
    | |/ _ \ \ /\ / / '_ \\
    | | (_) \ V  V /| | | |
    |_|\___/ \_/\_/ |_| |_|
-"""
+""")
 
     character.print_useful()
     town_options = [make_option('Enter the Tavern', 'T'),
@@ -27,7 +27,7 @@ def goto_town(character, refresh=True):
                     make_option('Visit the Blacksmith', 'B'),
                     make_option('Enter the Arena', 'A'),
                     make_option('Save and/or exit the game', 'S')]
-    print nav_menu(town_options, short=True)
+    print(nav_menu(town_options, short=True))
     val = get_val("stlfba9")
 
     if val == "s":
@@ -56,14 +56,14 @@ def goto_town(character, refresh=True):
 def goto_tavern(character):
     """Move character to tavern seletion screen."""
     clear()
-    print "Welcome to the:"
-    print color("""
+    print("Welcome to the:")
+    print(color("""
   _____
  |_   _|_ ___   _____ _ __ _ __
    | |/ _` \ \ / / _ \ '__| '_ \\
    | | (_| |\ V /  __/ |  | | | |
    |_|\__,_| \_/ \___|_|  |_| |_|
-""", "yellow")
+""", "yellow"))
 
     character.print_useful()
 
@@ -73,7 +73,7 @@ def goto_tavern(character):
                       make_option('Gamble some gold', 'G', gold=1, time=1),
                       make_option('Bartend', 'B', time=8),
                       make_option('Return to Town', 'T')]
-    print nav_menu(tavern_options)
+    print(nav_menu(tavern_options))
 
     val = get_val("mdsgbt")
     clear()
@@ -98,15 +98,15 @@ def goto_tavern(character):
 def goto_library(character):
     """Move character to library seletion screen."""
     clear()
-    print "Welcome to the:"
-    print color("""
+    print("Welcome to the:")
+    print(color(""")
   _       _
  | |   (_) |__  _ __ __ _ _ __ _   _
  | |   | | '_ \| '__/ _` | '__| | | |
  | |___| | |_) | | | (_| | |  | |_| |
  |_____|_|_.__/|_|  \__,_|_|   \__, |
                                 |___/
-""", "teal")
+""", "teal"))
 
     character.print_useful(True)
     library_options = [make_option('Study Magics', 'S', time=1),
@@ -115,7 +115,7 @@ def goto_library(character):
                        make_option('Read and relax', 'R', time=1),
                        make_option('Tutor Magics', 'M', time=8),
                        make_option('Return to Town', 'T')]
-    print nav_menu(library_options)
+    print(nav_menu(library_options))
 
     val = get_val("sbhrmt")
     clear()
@@ -140,14 +140,14 @@ def goto_library(character):
 def goto_fields(character):
     """Move character to field seletion screen."""
     clear()
-    print "Welcome to the:"
-    print color("""
+    print("Welcome to the:")
+    print(color("""
   _____        _     _
  |  ___(_) ___| | __| |___
  | |_  | |/ _ \ |/ _` / __|
  |  _| | |  __/ | (_| \__ \\
  |_|   |_|\___|_|\__,_|___/
-""", "green")
+""", "green"))
     character.print_useful()
 
     field_options = [make_option('Fight a training Dummy', 'D', time=2),
@@ -157,7 +157,7 @@ def goto_fields(character):
                      make_option('Enter a Race',          'R', gold=3, time=1),
                      make_option('Perform Show tricks',   'S', time=8),
                      make_option('Return to Town',        'T')]
-    print nav_menu(field_options)
+    print(nav_menu(field_options))
 
     val = get_val("dmcrst")
     clear()
@@ -182,14 +182,14 @@ def goto_fields(character):
 def goto_smith(character):
     """Move character to smith seletion screen."""
     clear()
-    print "Welcome to the:"
-    print color("""
+    print("Welcome to the:")
+    print(color("""
   ____            _ _   _
  / ___| _ __ ___ (_) |_| |__
  \___ \| '_ ` _ \| | __| '_ \\
   ___) | | | | | | | |_| | | |
  |____/|_|_|_| |_|_|\__|_| |_|
- """, "blue")
+ """, "blue"))
     character.print_useful()
 
     smith_options = [make_option('Upgrade your Weapon', 'W', gold='?'),
@@ -198,7 +198,7 @@ def goto_smith(character):
                      make_option('Work the Forge', 'F', time=8),
                      make_option('Return to Town', 'T')]
 
-    print nav_menu(smith_options)
+    print(nav_menu(smith_options))
     val = get_val("wamft")
 
     clear()

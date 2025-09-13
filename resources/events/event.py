@@ -41,7 +41,7 @@ class Event(object):
     # print "RUNNING EVENT"
         self.run_process(character)
         if character.requires(self.gold_req, self.time_req, self.life_req):
-            print self.message
+            print(self.message)
 
             #handle requirements
             character.time_pass(self.time_req)
@@ -54,7 +54,7 @@ class Event(object):
             for field, change in self.stats:
                 if field != "hp":
                     minVal = math.fabs(change)
-                    toChange = random.randint(minVal, minVal * 2)
+                    toChange = random.randint(int(minVal), int(minVal * 2))
                     if change < 0:
                         toChange = -toChange
                 else:

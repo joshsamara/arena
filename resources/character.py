@@ -1,10 +1,10 @@
 """Define character object and handle all actions directly involving."""
 import math
 import random
-import save
-from arena import goto_arena
-from locations import *
-from common import *
+from . import save
+from .arena import goto_arena
+from .locations import *
+from .common import *
 
 
 class Character(object):
@@ -82,7 +82,7 @@ class Character(object):
         pass_print = False
         if changed_stat == "hp" and self.hp + change >= self.vit:
             self.hp = self.vit
-            print color("Max HP!", "green")
+            print(color("Max HP!", "green"))
             pass_print = True
         else:
             if change < 0:
@@ -103,10 +103,10 @@ class Character(object):
             pass_print = True
 
         if not pass_print and changed_stat != "hrs":
-            print color("%s %s by %s!", to_color) % (PRETTY_STAT[changed_stat],
-                                                     change_text, change_val)
+            print(color("%s %s by %s!", to_color) % (PRETTY_STAT[changed_stat],
+                                                     change_text, change_val))
         elif changed_stat == "hrs":
-            print color("%s hour(s) passed!", "red") % change
+            print(color("%s hour(s) passed!", "red") % change)
 
     def time_pass(self, hrs=1):
         """Increment/decrement a character's time."""
@@ -131,9 +131,9 @@ class Character(object):
             self.hp = int(self.vit / 10)
             self.gold = random.randint(int(self.gold / 2), self.gold)
             self.hrs = random.randint(1, 10)
-            print color("You have passed out!", "red")
-            print "You wake up sometime in town"
-            print "It looks like some of your gold is missing"
+            print(color("You have passed out!", "red"))
+            print("You wake up sometime in town")
+            print("It looks like some of your gold is missing")
             self.move("town")
             return False
 
@@ -150,16 +150,16 @@ class Character(object):
         lifecheck = self.hp <= life
 
         if goldcheck or hourcheck or lifecheck:
-            print "Impossible!"
+            print("Impossible!")
             if goldcheck:
-                print color("You need %s gold", "red") % gold
-                print "You have %s gold" % self.gold
+                print(color("You need %s gold", "red") % gold)
+                print("You have %s gold" % self.gold)
             if hourcheck:
-                print color("You neeed %s hours", "red") % hours
-                print "There are %s hours left" % self.hrs
+                print(color("You neeed %s hours", "red") % hours)
+                print("There are %s hours left" % self.hrs)
             if lifecheck:
-                print color("You need %s life", "red") % life
-                print "You have %s life" % self.hp
+                print(color("You need %s life", "red") % life)
+                print("You have %s life" % self.hp)
             return False
         else:
             return True
@@ -188,7 +188,7 @@ class Character(object):
         # print some sort of bar here [========    ]
         if self.xp > needed:
             self.lvl = i
-            print color("Your level has increased to %d!", "green") % i
+            print(color("Your level has increased to %d!", "green") % i)
             for aStat in ["str", "int", "agil", "luck", "vit"]:
                 self.stat(aStat, random.randint(3, 10))
                 #add a little randomness to leveling for kicks
@@ -279,7 +279,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
                      self.str,  self.agil, self.int,
                      self.luck, self.wep,  self.defense,
                      self.day,  self.xp_perc(),   self.lvl)
-        print to_print % text_fill
+        print(to_print % text_fill)
         print_bar(1)
 
     def print_stat(self, stats, showtime=True):
@@ -288,7 +288,7 @@ DAY:   %3d    EXP:  %2d%%     LVL:  %3d"""
         print_bar(0)
         for a_stat in stats:
             text = PRETTY_STAT[a_stat]
-            print "%s: %s" % (text, self.__dict__[a_stat])
+            print("%s: %s" % (text, self.__dict__[a_stat]))
         if showtime:
-            print "Time: %s" % self.hrs
+            print("Time: %s" % self.hrs)
         print_bar(1)

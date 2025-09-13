@@ -28,16 +28,16 @@ def load():
         valid = loaded_char.__dict__.keys() == Character().__dict__.keys()
 
         if valid:
-        # print len(save_text)
-            print "Save file found"
-            print "Name:  %s" % loaded_char.name
-            print "Level: %s" % loaded_char.lvl
-            print "Gold:  %s" % loaded_char.gold
-            print "Day:   %s" % loaded_char.day
-            print "Would you like to load? (y/n)"
+        # print(len(save_text))
+            print("Save file found")
+            print("Name:  %s" % loaded_char.name)
+            print("Level: %s" % loaded_char.lvl)
+            print("Gold:  %s" % loaded_char.gold)
+            print("Day:   %s" % loaded_char.day)
+            print("Would you like to load? (y/n)")
             val = get_val("ny")
-            print "in function print"
-            print val
+            print("in function print")
+            print(val)
             if "n" in val:
                 pass
             if "y" in val:
@@ -45,16 +45,16 @@ def load():
                 loaded = True
                 NEW_GAME = False
         else:
-            print "Invalid save file"
+            print("Invalid save file")
             NEW_GAME = True
             cm()
 
     except IOError:
-        print "No save file found!"
+        print("No save file found!")
         NEW_GAME = True
         cm()
     except EOFError:
-        print "Invalid save file found!"
+        print("Invalid save file found!")
         NEW_GAME = True
         cm()
     clear()
@@ -92,21 +92,21 @@ if __name__ == "__main__":
                    By Josh Samara
 ___________________________________________________"""
 
-    print intro
+    print(intro)
     cm()
     clear()
     character = load()
     if NEW_GAME:
-        name = raw_input("What is your name?\n")
+        name = input("What is your name?\n")
         character.name = name
         clear()
-        print """Greetings, %s.
+        print("""Greetings, %s.
 Here you start your trials in the arena.
 Travel the town to train your skills and combat abilities.
 Enter the arena to fight and gain experience.
-""" % character.name
+""" % character.name)
         cm()
-        print """
+        print("""
 .
 .
 .
@@ -114,11 +114,11 @@ Enter the arena to fight and gain experience.
 You have a room in the tavern.
 You can spend the nights there.
 Your adventure starts here.
-"""
+""")
         cm("Press any key to proceed to Town.....")
         character.next = character.town
     else:
-        print "Welcome back, %s" % character.name
+        print("Welcome back, %s" % character.name)
         cm("Press any key to proceed to Town.....")
         character.next = character.town
         character.args = [False]

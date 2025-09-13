@@ -1,5 +1,5 @@
 """Smith events."""
-import event
+from . import event
 import math
 from .. import common
 
@@ -14,22 +14,22 @@ def upgrade(char, uptype):
     common.clear()
     cost = int(math.pow(10, upstats["level"]))
     common.print_bar(0)
-    print "%-20s:   %s" % ("Current %s level" % upstats["name"],
-                           upstats["level"])
-    print "Current upgrade cost:   %s gold" % cost
-    print "Current gold        :   %s gold" % char.gold
+    print("%-20s:   %s" % ("Current %s level" % upstats["name"],
+                           upstats["level"]))
+    print("Current upgrade cost:   %s gold" % cost)
+    print("Current gold        :   %s gold" % char.gold)
     common.print_bar(1)
-    print "Would you like to upgrade your %s? (y/n)" % (upstats["name"])
+    print("Would you like to upgrade your %s? (y/n)" % (upstats["name"]))
 
     val = common.get_val("yn")
     common.clear()
     if val == "y":
         if char.requires(cost, 0):
-            print "You upgrade your %s." % (upstats["name"])
+            print("You upgrade your %s." % (upstats["name"]))
             char.stat(upstats["stat"])
             char.print_stat([upstats["stat"]])
     elif val == "n":
-        print "You decide to save upgrading for later."
+        print("You decide to save upgrading for later.")
     char.move("smith")
     return
 

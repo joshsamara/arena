@@ -1,24 +1,24 @@
 """Handle all character axtions in the arena."""
-from common import *
-from fight import *
+from .common import *
+from .fight import *
 
 
 def goto_arena(character):
     """Enter the arena selection screen."""
     clear()
-    print "Welcome to the:"
-    print color("""
+    print("Welcome to the:")
+    print(color("""
      _
     / \\   _ __ ___ _ __   __ _
    / _ \\ | '__/ _ \\ '_ \\ / _` |
   / ___ \\| | |  __/ | | | (_| |
  /_/   \\_\\_|  \\___|_| |_|\\__,_|
- """, "red")
+ """, "red"))
     character.print_useful()
     arena_options = [make_option('Fight!', 'F', time=1, hp='?'),
                      make_option('Return to Town', 'T')]
 
-    print nav_menu(arena_options)
+    print(nav_menu(arena_options))
 
     val = get_val("ft")
 
@@ -29,7 +29,7 @@ def goto_arena(character):
         character.move("town", False)
     else:
         character.save_prompt()
-        print "ERROR IN ARENA SELECT"
+        print("ERROR IN ARENA SELECT")
     return
 
 
@@ -45,7 +45,7 @@ def fight(character):
 
 def victory(character, enemy):
     """Win the battle, increase xp, return to town."""
-    print "You win!"
+    print("You win!")
     character.stat("xp", enemy.calc_exp())
     character.stat("gold", enemy.calc_gold())
     character.check_lvlup()
@@ -66,7 +66,7 @@ def battle(character, enemy, message="\n>" * 4):
             else:
                 victory(character, enemy)
         else:
-            print "Error in battle"
+            print("Error in battle")
     elif val == "r":
         character.move("town")
     else:
@@ -77,32 +77,32 @@ def battle(character, enemy, message="\n>" * 4):
 
 def battle_display(character, enemy, message):
     """Display all battle information."""
-    print "-" * 40
-    print "Enemy: %s" % enemy.type
-    print "Level: %s" % enemy.lvl
+    print("-" * 40)
+    print("Enemy: %s" % enemy.type)
+    print("Level: %s" % enemy.lvl)
     ticks = min(
         int(math.ceil(enemy.hp / (enemy.lvl * 250.0) * 25.0)),
         25)
     healthbar = color(" " * ticks, "redh") + " " * (25 - ticks)
-    print "HP: [%s]" % healthbar
-    print "-" * 40
-    print message
+    print("HP: [%s]" % healthbar)
+    print("-" * 40)
+    print(message)
     print_bar(2)
-    print "Options:"
-    print "Attack!                   (A)"
-    print "Run!                      (R)"
+    print("Options:")
+    print("Attack!                   (A)")
+    print("Run!                      (R)")
     print_bar(2)
-    print "\n"
-    print "-" * 40
+    print("\n")
+    print("-" * 40)
     your_ticks = min(
         int(math.ceil(float(character.hp) / character.vit * 25.0)),
         25)
     your_healthbar = color(" " * your_ticks, "greenh")
     your_healthbar += " " * (25 - your_ticks)
-    print "You:"
-    print "Level: %s" % character.lvl
-    print "HP: [%s] %s/%s" % (your_healthbar, character.hp, character.vit)
-    print "-" * 40
+    print("You:")
+    print("Level: %s" % character.lvl)
+    print("HP: [%s] %s/%s" % (your_healthbar, character.hp, character.vit))
+    print("-" * 40)
     return
 
 

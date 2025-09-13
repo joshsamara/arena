@@ -1,5 +1,5 @@
 """Tavern events."""
-import event
+from . import event
 import math
 import random
 

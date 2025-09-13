@@ -1,5 +1,5 @@
 """Field events."""
-import event
+from . import event
 import math
 
 #DUMMY
