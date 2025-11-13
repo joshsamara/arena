@@ -12,7 +12,7 @@ def sleep_process(self, character):
 
 SLEEP = event.Event(
     gold_req=0,
-    time_req=1,
+    time_req=0,
     life_req=0,
     message="You sleep for the night",
     stats=[],
