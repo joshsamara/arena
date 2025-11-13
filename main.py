@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 """Terminal based Arena rpg game. Run with ./main.py."""
 
 from src.world import start

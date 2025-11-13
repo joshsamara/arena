@@ -128,8 +128,8 @@ class Character(object):
             return True
         else:
             self.stat("day")
-            self.hp = int(self.vit / 10)
-            self.gold = random.randint(int(self.gold / 2), self.gold)
+            self.hp = self.vit // 10
+            self.gold = random.randint(self.gold // 2, self.gold)
             self.hrs = random.randint(1, 10)
             print(color("You have passed out!", "red"))
             print("You wake up sometime in town")

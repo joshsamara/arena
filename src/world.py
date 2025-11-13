@@ -8,10 +8,10 @@ def load():
     global NEW_GAME
     loaded = False
     try:
-        save_file = open('save/arena.save', 'r')
+        save_file = open('save/arena.save', 'rb')
         loaded_char = pickle.load(save_file)
         save_file.close()
-        valid = loaded_char.__dict__.keys() == Character().__dict__.keys()
+        valid = set(loaded_char.__dict__.keys()) == set(Character().__dict__.keys())
 
         if valid:
         # print(len(save_text))

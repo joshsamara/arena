@@ -6,7 +6,7 @@ import pickle
 
 def save(character):
     """Dump character data into external file."""
-    save_file = open('save/arena.save', 'w')
+    save_file = open('save/arena.save', 'wb')
     temp = character.next
     character.next = None
     pickle.dump(character, save_file)

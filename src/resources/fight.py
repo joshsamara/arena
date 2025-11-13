@@ -49,15 +49,15 @@ def enemy_range(diff, lvl):
         else:
             return 0
     elif diff == 3:
-        return lvl / 5 * 2
+        return lvl // 5 * 2
     elif diff == 4:
         if lvl > 25:
-            return math.floor(lvl / 5) * 2 - 10
+            return lvl // 5 * 2 - 10
         else:
             return 0
     elif diff == 5:
         if lvl > 40:
-            return lvl / 5 * 2 - 20
+            return lvl // 5 * 2 - 20
         else:
             return 0
     elif diff == 6:
